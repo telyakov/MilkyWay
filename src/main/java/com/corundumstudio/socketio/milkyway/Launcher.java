@@ -4,6 +4,11 @@ import com.corundumstudio.socketio.Configuration;
 import com.corundumstudio.socketio.SocketIOClient;
 import com.corundumstudio.socketio.SocketIOServer;
 import com.corundumstudio.socketio.listener.DataListener;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
+import java.util.HashMap;
+
 public class Launcher {
 
     public static void main(String[] args) throws InterruptedException {
@@ -16,11 +21,21 @@ public class Launcher {
         server.addEventListener("request", TransportObject.class, new DataListener<TransportObject>() {
             @Override
             public void onData(SocketIOClient client, TransportObject data, AckRequest ackRequest) {
-                //todo: fetch data from sql
                 TransportObject response = new TransportObject();
-                response.setUserName(data.getUserName());
-                response.setMessage("testovoe soobshenie ру");
-                client.sendEvent("response", response);
+                try{
+                    HashMap<String, HashMap<String,String>> result = WebService.Exec(data.getQuery());
+                    Gson gson = new GsonBuilder().serializeNulls().create();
+                    String json = gson.toJson(result);
+                    response.setData(json);
+                    response.setId(data.getId());
+                    response.setType(data.getType());
+                }catch (Exception e){
+                    response.setError(e.getMessage());
+
+                }
+                finally {
+                    client.sendEvent("response", response);
+                }
                 // broadcast messages to all clients
 //                server.getBroadcastOperations().sendEvent("query", data);
             }
