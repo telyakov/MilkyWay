@@ -26,15 +26,23 @@ public void after() throws Exception {
 * 
 */ 
 @Test
-public void testExec() throws Exception {
-    String incorrectSql = "select 1 as id";
-    HashMap<String, HashMap<String,String>> result = WebService.Exec(incorrectSql);
+public void testExecOneRow() throws Exception {
+    String oneRowSelect = "select 1 as id";
+    HashMap<String, HashMap<String,String>> result = WebService.Exec(oneRowSelect);
 
     Gson gson = new GsonBuilder().serializeNulls().create();
     String json = gson.toJson(result);
     Assert.assertEquals("{\"1\":{\"id\":\"1\"}}", json);
 }
+    @Test
+    public void testExecTwoRow() throws Exception {
+        String twoRowSelect = "Select 33 as ID, 1 as Name UNION SELECT 44, 2";
+        HashMap<String, HashMap<String,String>> result = WebService.Exec(twoRowSelect);
+
+        Gson gson = new GsonBuilder().serializeNulls().create();
+        String json = gson.toJson(result);
+        Assert.assertEquals("{\"44\":{\"id\":\"44\",\"name\":\"2\"},\"33\":{\"id\":\"33\",\"name\":\"1\"}}", json);
+    }
 
 
-
-} 
+}

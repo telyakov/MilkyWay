@@ -58,7 +58,7 @@ public class WebService {
             index = key % columnsCount;
             if(index ==0 && !row.isEmpty()){
                 result.put(WebService.getID(row), row);
-                row.clear();
+                row = new HashMap<String, String>(columnsCount);
             }
             if(value.equals(WebService.NULL_MARK)){
                 value = null;
@@ -68,11 +68,10 @@ public class WebService {
                 value = "false";
             }
             row.put(columns[index], value);
-            if(!row.isEmpty()){
-                result.put(WebService.getID(row), row);
-
-            }
             key++;
+        }
+        if(!row.isEmpty()){
+            result.put(WebService.getID(row), row);
         }
         return result;
     }

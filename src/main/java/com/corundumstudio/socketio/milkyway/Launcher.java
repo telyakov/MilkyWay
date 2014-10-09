@@ -16,12 +16,11 @@ public class Launcher {
         Configuration config = new Configuration();
         config.setHostname("10.0.5.2");
         config.setPort(3000);
-
         final SocketIOServer server = new SocketIOServer(config);
-        server.addEventListener("request", TransportObject.class, new DataListener<TransportObject>() {
+        server.addEventListener("request", TDO.class, new DataListener<TDO>() {
             @Override
-            public void onData(SocketIOClient client, TransportObject data, AckRequest ackRequest) {
-                TransportObject response = new TransportObject();
+            public void onData(SocketIOClient client, TDO data, AckRequest ackRequest) {
+                TDO response = new TDO();
                 try{
                     HashMap<String, HashMap<String,String>> result = WebService.Exec(data.getQuery());
                     Gson gson = new GsonBuilder().serializeNulls().create();
@@ -40,6 +39,7 @@ public class Launcher {
 //                server.getBroadcastOperations().sendEvent("query", data);
             }
         });
+
         server.start();
         Thread.sleep(Integer.MAX_VALUE);
         server.stop();

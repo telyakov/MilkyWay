@@ -1,6 +1,6 @@
 package com.corundumstudio.socketio.milkyway;
 
-public class TransportObject {
+public class TDO {
 
     private String data;
     private String id;
@@ -8,10 +8,10 @@ public class TransportObject {
     private String query;
     private String error;
 
-    public TransportObject() {
+    public TDO() {
     }
 
-    public TransportObject(String id , String type, String query, String data, String error) {
+    public TDO(String id, String type, String query, String data, String error) {
         super();
         this.id = id;
         this.type = type;
