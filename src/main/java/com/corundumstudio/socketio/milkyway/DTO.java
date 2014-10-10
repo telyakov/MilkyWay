@@ -1,23 +1,33 @@
 package com.corundumstudio.socketio.milkyway;
 
-public class TDO {
+public class DTO {
 
     private String data;
     private String id;
     private String type;
     private String query;
     private String error;
+    private String key;
 
-    public TDO() {
+    public DTO() {
     }
 
-    public TDO(String id, String type, String query, String data, String error) {
+    public DTO(String id, String type, String query, String data, String error, String key) {
         super();
         this.id = id;
         this.type = type;
         this.data = data;
         this.query = query;
         this.error = error;
+        this.key = key;
+    }
+
+    public String getKey() {
+        return key;
+    }
+
+    public void setKey(String key) {
+        this.key = key;
     }
 
     public String getId() {

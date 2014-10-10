@@ -14,15 +14,15 @@ public class Launcher {
     public static void main(String[] args) throws InterruptedException {
 
         Configuration config = new Configuration();
-        config.setHostname("10.0.5.2");
+        config.setHostname("192.168.0.34");
         config.setPort(3000);
         final SocketIOServer server = new SocketIOServer(config);
-        server.addEventListener("request", TDO.class, new DataListener<TDO>() {
+        server.addEventListener("request", DTO.class, new DataListener<DTO>() {
             @Override
-            public void onData(SocketIOClient client, TDO data, AckRequest ackRequest) {
-                TDO response = new TDO();
+            public void onData(SocketIOClient client, DTO data, AckRequest ackRequest) {
+                DTO response = new DTO();
                 try{
-                    HashMap<String, HashMap<String,String>> result = WebService.Exec(data.getQuery());
+                    HashMap<String, HashMap<String,String>> result = WebService.Exec(data.getQuery(), data.getKey());
                     Gson gson = new GsonBuilder().serializeNulls().create();
                     String json = gson.toJson(result);
                     response.setData(json);

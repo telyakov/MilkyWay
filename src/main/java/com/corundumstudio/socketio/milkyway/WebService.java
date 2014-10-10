@@ -9,15 +9,14 @@ import java.util.UUID;
 
 
 public class WebService {
-    final static public String KEY = "test6543210";
     final static public String ID_COLUMN = "id";
     final static public String NULL_MARK = "NULL";
     final static public String TRUE_MARK = "True";
     final static public String FALSE_MARK = "False";
 
-    public static HashMap<String, HashMap<String,String>> Exec(String sql) throws WebServiceException {
+    public static HashMap<String, HashMap<String,String>> Exec(String sql, String key) throws WebServiceException {
         try{
-            ArrayOfString data = new Directory().getDirectorySoap().exec2(WebService.KEY, sql, "", "", "", "", "");
+            ArrayOfString data = new Directory().getDirectorySoap().exec2(key, sql, "", "", "", "", "");
             return WebService.parse(data);
         }catch (Exception e){
             throw new WebServiceException(e.getMessage());

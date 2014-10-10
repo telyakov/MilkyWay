@@ -28,7 +28,7 @@ public void after() throws Exception {
 @Test
 public void testExecOneRow() throws Exception {
     String oneRowSelect = "select 1 as id";
-    HashMap<String, HashMap<String,String>> result = WebService.Exec(oneRowSelect);
+    HashMap<String, HashMap<String,String>> result = WebService.Exec(oneRowSelect, "test6543210");
 
     Gson gson = new GsonBuilder().serializeNulls().create();
     String json = gson.toJson(result);
@@ -37,7 +37,7 @@ public void testExecOneRow() throws Exception {
     @Test
     public void testExecTwoRow() throws Exception {
         String twoRowSelect = "Select 33 as ID, 1 as Name UNION SELECT 44, 2";
-        HashMap<String, HashMap<String,String>> result = WebService.Exec(twoRowSelect);
+        HashMap<String, HashMap<String,String>> result = WebService.Exec(twoRowSelect, "test6543210");
 
         Gson gson = new GsonBuilder().serializeNulls().create();
         String json = gson.toJson(result);
