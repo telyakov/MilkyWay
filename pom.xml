@@ -74,5 +74,3 @@
     </build>
 
 </project>
-        <!--http://avianey.blogspot.ru/2012/12/maven-it-case-background-process.html-->
-        <!--wmic process where (commandline like "%Launcher%" and not name="wmic.exe") delete-->

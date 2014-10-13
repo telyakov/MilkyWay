@@ -14,7 +14,6 @@ public class Launcher {
     public static void main(String[] args) throws InterruptedException {
 
         Configuration config = new Configuration();
-        config.setHostname("192.168.0.34");
         config.setPort(3000);
         final SocketIOServer server = new SocketIOServer(config);
         server.addEventListener("request", DTO.class, new DataListener<DTO>() {
