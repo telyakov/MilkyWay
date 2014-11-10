@@ -22,6 +22,15 @@ public class DTO {
         this.key = key;
     }
 
+    private String convertToUTF8(String s) {
+        String out = null;
+        try {
+            out = new String(s.getBytes("ISO-8859-1"), "UTF-8" );
+        } catch (java.io.UnsupportedEncodingException e) {
+            return null;
+        }
+        return out;
+    }
     public String getKey() {
         return key;
     }
@@ -51,7 +60,7 @@ public class DTO {
     }
 
     public void setQuery(String query) {
-        this.query = query;
+        this.query = this.convertToUTF8(query);
     }
 
     public String getError() {
