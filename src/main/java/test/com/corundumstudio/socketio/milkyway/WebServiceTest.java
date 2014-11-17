@@ -9,6 +9,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 public class WebServiceTest { 
 
@@ -28,7 +29,7 @@ public void after() throws Exception {
 @Test
 public void testExecOneRow() throws Exception {
     String oneRowSelect = "select 1 as id";
-    HashMap<String, HashMap<String,String>> result = WebService.Exec(oneRowSelect, "test6543210");
+    LinkedHashMap<String, HashMap<String,String>> result = WebService.Exec(oneRowSelect, "test6543210");
 
     Gson gson = new GsonBuilder().serializeNulls().create();
     String json = gson.toJson(result);
@@ -37,12 +38,13 @@ public void testExecOneRow() throws Exception {
     @Test
     public void testExecTwoRow() throws Exception {
         String twoRowSelect = "Select 33 as ID, 1 as Name UNION SELECT 44, 2";
-        HashMap<String, HashMap<String,String>> result = WebService.Exec(twoRowSelect, "test6543210");
+        LinkedHashMap<String, HashMap<String,String>> result = WebService.Exec(twoRowSelect, "test6543210");
 
         Gson gson = new GsonBuilder().serializeNulls().create();
         String json = gson.toJson(result);
         Assert.assertEquals("{\"44\":{\"id\":\"44\",\"name\":\"2\"},\"33\":{\"id\":\"33\",\"name\":\"1\"}}", json);
     }
+
 
 
 }

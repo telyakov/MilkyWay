@@ -1,4 +1,5 @@
 package com.corundumstudio.socketio.milkyway;
+
 import com.corundumstudio.socketio.AckRequest;
 import com.corundumstudio.socketio.Configuration;
 import com.corundumstudio.socketio.SocketIOClient;
@@ -8,6 +9,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 public class Launcher {
 
@@ -22,7 +24,7 @@ public class Launcher {
             public void onData(SocketIOClient client, DTO data, AckRequest ackRequest) {
                 DTO response = new DTO();
                 try{
-                    HashMap<String, HashMap<String,String>> result = WebService.Exec(data.getQuery(), data.getKey());
+                    LinkedHashMap<String, HashMap<String,String>> result = WebService.Exec(data.getQuery(), data.getKey());
                     Gson gson = new GsonBuilder().serializeNulls().create();
                     String json = gson.toJson(result);
                     response.setData(json);

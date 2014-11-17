@@ -4,6 +4,7 @@ import com.corundumstudio.socketio.milkyway.soap.ArrayOfString;
 import com.corundumstudio.socketio.milkyway.soap.Directory;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.UUID;
 
@@ -14,7 +15,7 @@ public class WebService {
     final static public String TRUE_MARK = "True";
     final static public String FALSE_MARK = "False";
 
-    public static HashMap<String, HashMap<String,String>> Exec(String sql, String key) throws WebServiceException {
+    public static LinkedHashMap<String, HashMap<String,String>> Exec(String sql, String key) throws WebServiceException {
         try{
             ArrayOfString data = new Directory().getDirectorySoap().exec2(key, sql, "", "", "", "", "");
             return WebService.parse(data);
@@ -32,7 +33,7 @@ public class WebService {
         }
         return id;
     }
-    private static HashMap<String, HashMap<String,String>>  parse(ArrayOfString data){
+    private static LinkedHashMap<String, HashMap<String,String>>  parse(ArrayOfString data){
         List<String> list = data.getString();
         int columnsCount = Integer.parseInt(list.remove(0));
         String[] columns = new String[columnsCount];
@@ -51,7 +52,7 @@ public class WebService {
         }
         int key = 0;
         int index;
-        HashMap<String, HashMap<String,String>> result =new HashMap<String, HashMap<String,String>>();
+        LinkedHashMap<String, HashMap<String,String>> result =new LinkedHashMap<String, HashMap<String,String>>();
         HashMap<String,String> row = new HashMap<String, String>(columnsCount);
         for(String value : list){
             index = key % columnsCount;
