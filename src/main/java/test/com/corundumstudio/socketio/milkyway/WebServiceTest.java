@@ -1,6 +1,7 @@
 package test.com.corundumstudio.socketio.milkyway;
 
-import com.corundumstudio.socketio.milkyway.WebService;
+import com.corundumstudio.socketio.milkyway.connection.Connection;
+import com.corundumstudio.socketio.milkyway.connection.WebService;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import junit.framework.Assert;
@@ -28,8 +29,9 @@ public void after() throws Exception {
 */ 
 @Test
 public void testExecOneRow() throws Exception {
+    Connection conn = new WebService();
     String oneRowSelect = "select 1 as id";
-    LinkedHashMap<String, HashMap<String,String>> result = WebService.Exec(oneRowSelect, "test6543210");
+    LinkedHashMap<String, HashMap<String,String>> result = conn.Exec(oneRowSelect, "test6543210");
 
     Gson gson = new GsonBuilder().serializeNulls().create();
     String json = gson.toJson(result);
@@ -37,12 +39,13 @@ public void testExecOneRow() throws Exception {
 }
     @Test
     public void testExecTwoRow() throws Exception {
+        Connection conn = new WebService();
         String twoRowSelect = "Select 33 as ID, 1 as Name UNION SELECT 44, 2";
-        LinkedHashMap<String, HashMap<String,String>> result = WebService.Exec(twoRowSelect, "test6543210");
+        LinkedHashMap<String, HashMap<String,String>> result = conn.Exec(twoRowSelect, "test6543210");
 
         Gson gson = new GsonBuilder().serializeNulls().create();
         String json = gson.toJson(result);
-        Assert.assertEquals("{\"44\":{\"id\":\"44\",\"name\":\"2\"},\"33\":{\"id\":\"33\",\"name\":\"1\"}}", json);
+        Assert.assertEquals("{\"33\":{\"id\":\"33\",\"name\":\"1\"},\"44\":{\"id\":\"44\",\"name\":\"2\"}}", json);
     }
 
 
