@@ -1,25 +1,47 @@
 package com.corundumstudio.socketio.milkyway.connection;
 
-import com.corundumstudio.socketio.milkyway.soap.ArrayOfString;
-import com.corundumstudio.socketio.milkyway.soap.Directory;
+import com.corundumstudio.socketio.milkyway.soap.*;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.UUID;
 
-
 public class WebService implements Connection {
     final static public String ID_COLUMN = "id";
     final static public String NULL_MARK = "NULL";
     final static public String TRUE_MARK = "True";
     final static public String FALSE_MARK = "False";
+    private DirectorySoap _conn = null;
 
+    private DirectorySoap getConn() {
+        if (this._conn == null) {
+            this._conn = new Directory().getDirectorySoap();
+        }
+        return this._conn;
+    }
+
+    @Override
     public LinkedHashMap<String, HashMap<String, String>> Exec(String sql, String key) throws ConnectionException {
         try {
-            ArrayOfString data = new Directory().getDirectorySoap().exec2(key, sql, "", "", "", "", "");
+            ArrayOfString data = this.getConn().exec2(key, sql, "", "", "", "", "");
             return WebService.parse(data);
         } catch (Exception e) {
+            throw new ConnectionException(e.getMessage());
+        }
+    }
+
+    @Override
+    public byte[] FileGet(int id, String key) throws ConnectionException {
+        try{
+            List<FileModel> list = this.getConn().fileGet(key, id).getFileModel();
+            if(list.isEmpty()){
+                return null;
+            }else{
+                return  list.get(0).getFileData();
+            }
+
+        }catch (Exception e){
             throw new ConnectionException(e.getMessage());
         }
     }

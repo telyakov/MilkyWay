@@ -1,6 +1,5 @@
-package test.com.corundumstudio.socketio.milkyway;
+package test.com.corundumstudio.socketio.milkyway.connection;
 
-import com.corundumstudio.socketio.milkyway.connection.Connection;
 import com.corundumstudio.socketio.milkyway.connection.WebService;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -29,7 +28,7 @@ public void after() throws Exception {
 */ 
 @Test
 public void testExecOneRow() throws Exception {
-    Connection conn = new WebService();
+    WebService conn = new WebService();
     String oneRowSelect = "select 1 as id";
     LinkedHashMap<String, HashMap<String,String>> result = conn.Exec(oneRowSelect, "test6543210");
 
@@ -39,7 +38,7 @@ public void testExecOneRow() throws Exception {
 }
     @Test
     public void testExecTwoRow() throws Exception {
-        Connection conn = new WebService();
+        WebService conn = new WebService();
         String twoRowSelect = "Select 33 as ID, 1 as Name UNION SELECT 44, 2";
         LinkedHashMap<String, HashMap<String,String>> result = conn.Exec(twoRowSelect, "test6543210");
 
@@ -47,7 +46,13 @@ public void testExecOneRow() throws Exception {
         String json = gson.toJson(result);
         Assert.assertEquals("{\"33\":{\"id\":\"33\",\"name\":\"1\"},\"44\":{\"id\":\"44\",\"name\":\"2\"}}", json);
     }
-
+    @Test
+    public void testFileGet() throws Exception {
+        WebService conn = new WebService();
+        String twoRowSelect = "Select 33 as ID, 1 as Name UNION SELECT 44, 2";
+        byte[] result = conn.FileGet(11, "test6543210");
+        Assert.assertEquals(13312, result.length);
+    }
 
 
 }
