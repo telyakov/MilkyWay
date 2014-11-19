@@ -46,13 +46,4 @@ public void testExecOneRow() throws Exception {
         String json = gson.toJson(result);
         Assert.assertEquals("{\"33\":{\"id\":\"33\",\"name\":\"1\"},\"44\":{\"id\":\"44\",\"name\":\"2\"}}", json);
     }
-    @Test
-    public void testFileGet() throws Exception {
-        WebService conn = new WebService();
-        String twoRowSelect = "Select 33 as ID, 1 as Name UNION SELECT 44, 2";
-        byte[] result = conn.FileGet(11, "test6543210");
-        Assert.assertEquals(13312, result.length);
-    }
-
-
 }

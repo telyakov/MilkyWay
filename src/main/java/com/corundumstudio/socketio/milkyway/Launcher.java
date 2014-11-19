@@ -24,27 +24,45 @@ public class Launcher {
 
         server.addEventListener("request", DTO.class, new DataListener<DTO>() {
             Connection conn = new WebService();
+
             @Override
             public void onData(SocketIOClient client, DTO data, AckRequest ackRequest) {
-
                 DTO response = new DTO();
-                try{
-                    LinkedHashMap<String, HashMap<String,String>> result = conn.Exec(data.getQuery(), data.getKey());
+                try {
+                    LinkedHashMap<String, HashMap<String, String>> result = conn.Exec(data.getQuery(), data.getKey());
                     Gson gson = new GsonBuilder().serializeNulls().create();
                     String json = gson.toJson(result);
                     response.setData(json);
                     response.setId(data.getId());
                     response.setType(data.getType());
-                }catch (Exception e){
+                } catch (Exception e) {
                     response.setError(e.getMessage());
 
-                }
-                finally {
+                } finally {
                     client.sendEvent("response", response);
                 }
             }
         });
 
+        server.addEventListener("fileRequest", FileDTO.class, new DataListener<FileDTO>() {
+            Connection conn = new WebService();
+
+            @Override
+            public void onData(SocketIOClient client, FileDTO data, AckRequest ackRequest) {
+                FileDTO response = new FileDTO();
+                try {
+                    byte[] result = conn.FileGet(data.getId(), data.getKey());
+
+                    response.setData(new String(result, "windows-1251"));
+                    response.setId(data.getId());
+                } catch (Exception e) {
+                    response.setError(e.getMessage());
+
+                } finally {
+                    client.sendEvent("fileResponse", response);
+                }
+            }
+        });
         server.start();
         Thread.sleep(Integer.MAX_VALUE);
         server.stop();
