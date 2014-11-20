@@ -39,11 +39,24 @@ public void testExecOneRow() throws Exception {
     @Test
     public void testExecTwoRow() throws Exception {
         WebService conn = new WebService();
+
+
         String twoRowSelect = "Select 33 as ID, 1 as Name UNION SELECT 44, 2";
         LinkedHashMap<String, HashMap<String,String>> result = conn.Exec(twoRowSelect, "test6543210");
 
         Gson gson = new GsonBuilder().serializeNulls().create();
         String json = gson.toJson(result);
         Assert.assertEquals("{\"33\":{\"id\":\"33\",\"name\":\"1\"},\"44\":{\"id\":\"44\",\"name\":\"2\"}}", json);
+    }
+    @Test
+    public void testGetRow() throws Exception {
+        WebService webService = new WebService();
+        String sql = "Select 'test' as name";
+        LinkedHashMap<String,HashMap<String,String>> result = webService.Exec(sql, "test6543210");
+        HashMap<String, String> firstRow = webService.getRow(result, 0);
+        HashMap<String, String> secondRow = webService.getRow(result, 1);
+        Assert.assertEquals(firstRow.get("name"), "test");
+        Assert.assertNull(secondRow);
+
     }
 }

@@ -2,10 +2,7 @@ package com.corundumstudio.socketio.milkyway.connection;
 
 import com.corundumstudio.socketio.milkyway.soap.*;
 
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 public class WebService implements Connection {
     final static public String ID_COLUMN = "id";
@@ -29,6 +26,21 @@ public class WebService implements Connection {
         } catch (Exception e) {
             throw new ConnectionException(e.getMessage());
         }
+    }
+
+    @Override
+    public HashMap<String, String> getRow(LinkedHashMap<String, HashMap<String, String>> recordset, int index) {
+        Iterator<HashMap<String,String>> iterator = recordset.values().iterator();
+        HashMap<String, String> current;
+        int counter = 0;
+        while (iterator.hasNext()){
+            current = iterator.next();
+            if(counter == index){
+                return current;
+            }
+            counter+=1;
+        }
+        return null;
     }
 
     @Override

@@ -1,20 +1,29 @@
 package com.corundumstudio.socketio.milkyway;
 
 public class FileDTO {
-    private String data;
+    private byte[] data;
     private int id;
     private String error;
     private String key;
-
+    private String name;
     public FileDTO() {
     }
 
-    public FileDTO(int id, String data, String error, String key) {
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public FileDTO(int id, byte[] data, String error, String key, String name) {
         super();
         this.id = id;
         this.data = data;
         this.error = error;
         this.key = key;
+        this.name = name;
     }
 
     public String getKey() {
@@ -41,12 +50,12 @@ public class FileDTO {
         this.error = error;
     }
 
-    public String getData() {
+    public byte[] getData() {
 
         return data;
     }
 
-    public void setData(String data) {
+    public void setData(byte[] data) {
         this.data = data;
     }
 

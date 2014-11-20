@@ -7,6 +7,8 @@ import com.corundumstudio.socketio.SocketIOServer;
 import com.corundumstudio.socketio.listener.DataListener;
 import com.corundumstudio.socketio.milkyway.connection.Connection;
 import com.corundumstudio.socketio.milkyway.connection.WebService;
+import com.corundumstudio.socketio.milkyway.files.BlobWorker;
+import com.corundumstudio.socketio.milkyway.files.MetaDataWorker;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -51,10 +53,12 @@ public class Launcher {
             public void onData(SocketIOClient client, FileDTO data, AckRequest ackRequest) {
                 FileDTO response = new FileDTO();
                 try {
-                    byte[] result = conn.FileGet(data.getId(), data.getKey());
-
-                    response.setData(new String(result, "windows-1251"));
-                    response.setId(data.getId());
+                    Thread blobThread = new Thread(new BlobWorker(response, conn, data));
+                    Thread metaThread = new Thread(new MetaDataWorker(response, conn, data));
+                    blobThread.start();
+                    metaThread.start();
+                    blobThread.join();
+                    metaThread.join();
                 } catch (Exception e) {
                     response.setError(e.getMessage());
 
@@ -66,6 +70,7 @@ public class Launcher {
         server.start();
         Thread.sleep(Integer.MAX_VALUE);
         server.stop();
+
     }
 
 }
