@@ -67,6 +67,31 @@ public class Launcher {
                 }
             }
         });
+        server.addEventListener("xmlRequest", FileDTO.class, new DataListener<FileDTO>() {
+            Connection conn = new WebService();
+
+            @Override
+            public void onData(SocketIOClient client, FileDTO data, AckRequest ackRequest) {
+                FileDTO response = new FileDTO();
+                try {
+                    response.setName(data.getName());
+
+                    String sql = "core.XmlFileGet '" + data.getName() + "'";
+                    LinkedHashMap<String,HashMap<String,String>> result = conn.Exec(sql, data.getKey());
+                    HashMap<String, String> row =conn.getRow(result, 0);
+                    data.setId(Integer.parseInt(row.get("id")));
+                    response.setId(data.getId());
+                    Thread blobThread = new Thread(new BlobWorker(response, conn, data));
+                    blobThread.start();
+                    blobThread.join();
+                } catch (Exception e) {
+                    response.setError(e.getMessage());
+
+                } finally {
+                    client.sendEvent("xmlResponse", response);
+                }
+            }
+        });
         server.start();
         Thread.sleep(Integer.MAX_VALUE);
         server.stop();

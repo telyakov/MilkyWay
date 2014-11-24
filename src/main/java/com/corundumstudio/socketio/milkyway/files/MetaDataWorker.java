@@ -4,7 +4,6 @@ import com.corundumstudio.socketio.milkyway.FileDTO;
 import com.corundumstudio.socketio.milkyway.connection.Connection;
 
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 
 public class MetaDataWorker  implements Runnable{
@@ -24,7 +23,6 @@ public class MetaDataWorker  implements Runnable{
         try {
             String sql = "Attachments.MetaDataGet " + this.request.getId();
             LinkedHashMap<String,HashMap<String,String>> result = conn.Exec(sql, this.request.getKey());
-            Iterator<HashMap<String,String>> iterator = result.values().iterator();
             HashMap<String, String> row =conn.getRow(result, 0);
             this.dto.setName(row.get("name"));
             this.dto.setId(request.getId());
