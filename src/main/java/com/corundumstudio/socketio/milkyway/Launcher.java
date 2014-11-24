@@ -75,7 +75,7 @@ public class Launcher {
                 FileDTO response = new FileDTO();
                 try {
                     response.setName(data.getName());
-
+                    response.setType(data.getType());
                     String sql = "core.XmlFileGet '" + data.getName() + "'";
                     LinkedHashMap<String,HashMap<String,String>> result = conn.Exec(sql, data.getKey());
                     HashMap<String, String> row =conn.getRow(result, 0);
