@@ -78,9 +78,9 @@ public class Launcher {
                     response.setType(data.getType());
                     String sql = "core.XmlFileGet '" + data.getName() + "'";
                     LinkedHashMap<String,HashMap<String,String>> result = conn.Exec(sql, data.getKey());
-                    HashMap<String, String> row =conn.getRow(result, 0);
-                    data.setId(Integer.parseInt(row.get("id")));
+                    HashMap<String, String> row = conn.getRow(result, 0);
                     response.setId(data.getId());
+                    data.setId(Integer.parseInt(row.get("id")));
                     Thread blobThread = new Thread(new BlobWorker(response, conn, data));
                     blobThread.start();
                     blobThread.join();
