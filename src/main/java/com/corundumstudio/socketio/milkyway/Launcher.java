@@ -31,12 +31,12 @@ public class Launcher {
             public void onData(SocketIOClient client, DTO data, AckRequest ackRequest) {
                 DTO response = new DTO();
                 try {
+                    response.setId(data.getId());
+                    response.setType(data.getType());
                     LinkedHashMap<String, HashMap<String, String>> result = conn.Exec(data.getQuery(), data.getKey());
                     Gson gson = new GsonBuilder().serializeNulls().create();
                     String json = gson.toJson(result);
                     response.setData(json);
-                    response.setId(data.getId());
-                    response.setType(data.getType());
                 } catch (Exception e) {
                     response.setError(e.getMessage());
 
