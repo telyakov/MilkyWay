@@ -46,6 +46,29 @@ public class Launcher {
             }
         });
 
+        server.addEventListener("execMultiply", MultiplyExecDTO.class, new DataListener<MultiplyExecDTO>() {
+            Connection conn = new WebService();
+
+            @Override
+            public void onData(SocketIOClient client, MultiplyExecDTO data, AckRequest ackRequest) {
+                MultiplyExecDTO response = new MultiplyExecDTO();
+                try {
+                    response.setId(data.getId());
+                    response.setType(data.getType());
+                    Boolean success = conn.ExecMultiply(data.getSqlList(), data.getKey());
+                    response.setData( success.toString());
+                    if(!success){
+                        response.setError("Unknown server error");
+                    }
+                } catch (Exception e) {
+                    response.setError(e.getMessage());
+
+                } finally {
+                    client.sendEvent("response", response);
+                }
+            }
+        });
+
         server.addEventListener("fileRequest", FileDTO.class, new DataListener<FileDTO>() {
             Connection conn = new WebService();
 

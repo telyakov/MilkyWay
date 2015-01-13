@@ -59,4 +59,12 @@ public void testExecOneRow() throws Exception {
         Assert.assertNull(secondRow);
 
     }
+    @Test
+    public void testMultiplyExec() throws Exception {
+        WebService webService = new WebService();
+        String [] sqlList = new String[]{"select 1", "select 2"};
+        Boolean success = webService.ExecMultiply(sqlList, "test6543210");
+        Assert.assertTrue(success);
+
+    }
 }

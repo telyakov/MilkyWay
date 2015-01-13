@@ -1,36 +1,28 @@
 package com.corundumstudio.socketio.milkyway;
 
-public class DTO {
+
+public class MultiplyExecDTO {
 
     private String data;
     private String id;
     private String type;
-    private String query;
+    private String[] sqlList;
     private String error;
     private String key;
 
-    public DTO() {
+    public MultiplyExecDTO() {
     }
 
-    public DTO(String id, String type, String query, String data, String error, String key) {
+    public MultiplyExecDTO(String id, String type, String[] sqlList, String data, String error, String key) {
         super();
         this.id = id;
         this.type = type;
         this.data = data;
-        this.query = query;
+        this.sqlList = sqlList;
         this.error = error;
         this.key = key;
     }
 
-    public static String convertToUTF8(String s) {
-        String out = null;
-        try {
-            out = new String(s.getBytes("ISO-8859-1"), "UTF-8" );
-        } catch (java.io.UnsupportedEncodingException e) {
-            return null;
-        }
-        return out;
-    }
     public String getKey() {
         return key;
     }
@@ -55,12 +47,16 @@ public class DTO {
         this.type = type;
     }
 
-    public String getQuery() {
-        return query;
+    public String[] getSqlList() {
+        return sqlList;
     }
 
-    public void setQuery(String query) {
-        this.query = this.convertToUTF8(query);
+    public void setSqlList(String[] sqlList) {
+        String[] prepareData = new String[sqlList.length];
+        for(int i = 0; i< sqlList.length; i++){
+            prepareData[i] = DTO.convertToUTF8(sqlList[i]);
+        }
+        this.sqlList = prepareData;
     }
 
     public String getError() {
@@ -79,4 +75,5 @@ public class DTO {
     public void setData(String data) {
         this.data = data;
     }
+
 }

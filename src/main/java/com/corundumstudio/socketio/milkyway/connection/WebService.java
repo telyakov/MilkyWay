@@ -30,30 +30,42 @@ public class WebService implements Connection {
 
     @Override
     public HashMap<String, String> getRow(LinkedHashMap<String, HashMap<String, String>> recordset, int index) {
-        Iterator<HashMap<String,String>> iterator = recordset.values().iterator();
+        Iterator<HashMap<String, String>> iterator = recordset.values().iterator();
         HashMap<String, String> current;
         int counter = 0;
-        while (iterator.hasNext()){
+        while (iterator.hasNext()) {
             current = iterator.next();
-            if(counter == index){
+            if (counter == index) {
                 return current;
             }
-            counter+=1;
+            counter += 1;
         }
         return null;
     }
 
     @Override
     public byte[] FileGet(int id, String key) throws ConnectionException {
-        try{
+        try {
             List<FileModel> list = this.getConn().fileGet(key, id).getFileModel();
-            if(list.isEmpty()){
+            if (list.isEmpty()) {
                 return null;
-            }else{
-                return  list.get(0).getFileData();
+            } else {
+                return list.get(0).getFileData();
             }
 
-        }catch (Exception e){
+        } catch (Exception e) {
+            throw new ConnectionException(e.getMessage());
+        }
+    }
+
+    public boolean ExecMultiply(String[] sqlList, String key) throws ConnectionException {
+        try {
+            ArrayOfString array = new ArrayOfString();
+            for (int i = 0; i < sqlList.length; i++) {
+                array.getString().add(sqlList[i]);
+            }
+            return this.getConn().execMultiply(key, array);
+        } catch (Exception e) {
             throw new ConnectionException(e.getMessage());
         }
     }
