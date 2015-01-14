@@ -68,6 +68,24 @@ public class Launcher {
                 }
             }
         });
+        server.addEventListener("fileUpload", FileDTO.class, new DataListener<FileDTO>() {
+            Connection conn = new WebService();
+            @Override
+            public void onData(SocketIOClient client, FileDTO data, AckRequest ackRequest) {
+                DTO response = new DTO();
+                try {
+                    response.setType(data.getType());
+                    response.setData("true");
+                    Connection conn = new WebService();
+                    conn.AttachmentIns(data.getSql(), data.getKey(), data.getData());
+                } catch (Exception e) {
+                    response.setError(e.getMessage());
+
+                } finally {
+                    client.sendEvent("response", response);
+                }
+            }
+        });
 
         server.addEventListener("fileRequest", FileDTO.class, new DataListener<FileDTO>() {
             Connection conn = new WebService();

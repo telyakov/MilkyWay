@@ -70,6 +70,13 @@ public class WebService implements Connection {
         }
     }
 
+    public void AttachmentIns(String sql, String key, byte[] data) throws ConnectionException{
+        try {
+            this.getConn().attachmentIns(key, sql, data);
+        } catch (Exception e) {
+            throw new ConnectionException(e.getMessage());
+        }
+    }
     private static String getID(HashMap<String, String> row) {
         String id;
         if (row.containsKey(WebService.ID_COLUMN)) {

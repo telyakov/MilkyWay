@@ -3,6 +3,16 @@ package com.corundumstudio.socketio.milkyway;
 public class FileDTO {
     private byte[] data;
     private int id;
+
+    public String getSql() {
+        return sql;
+    }
+
+    public void setSql(String sql) {
+        this.sql = sql;
+    }
+
+    private String sql;
     private String error;
     private String key;
     private String name;
@@ -27,13 +37,14 @@ public class FileDTO {
         this.name = name;
     }
 
-    public FileDTO(int id, byte[] data, String error, String key, String name) {
+    public FileDTO(int id, byte[] data, String error, String key, String name, String sql) {
         super();
         this.id = id;
         this.data = data;
         this.error = error;
         this.key = key;
         this.name = name;
+        this.name = sql;
     }
 
     public String getKey() {
