@@ -67,4 +67,15 @@ public void testExecOneRow() throws Exception {
         Assert.assertTrue(success);
 
     }
+    @Test
+    public void testFileGet() throws Exception {
+        try {
+        WebService webService = new WebService();
+//        String [] sqlList = new String[]{"select 1", "select 2"};
+       webService.FileGet(255091, "test6543210");
+        Assert.assertTrue(true);
+        }catch (Exception e){
+        Assert.assertTrue(false);
+        }
+    }
 }

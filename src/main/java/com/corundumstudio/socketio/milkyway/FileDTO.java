@@ -9,7 +9,7 @@ public class FileDTO {
     }
 
     public void setSql(String sql) {
-        this.sql = DTO.convertToUTF8(sql);
+        this.sql =sql;
     }
 
     private String sql;

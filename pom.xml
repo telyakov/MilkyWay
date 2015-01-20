@@ -4,7 +4,7 @@
 
     <groupId>MilkyWay</groupId>
     <artifactId>MilkyWay</artifactId>
-    <version>0.0.1</version>
+    <version>0.0.2</version>
     <packaging>jar</packaging>
     <inceptionYear>2014</inceptionYear>
 
@@ -27,7 +27,7 @@
         <dependency>
             <groupId>com.corundumstudio.socketio</groupId>
             <artifactId>netty-socketio</artifactId>
-            <version>1.7.3</version>
+            <version>1.7.6</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>

@@ -21,9 +21,10 @@ public class Launcher {
 
         Configuration config = new Configuration();
         config.setHostname("192.168.0.34");
+        config.setMaxFramePayloadLength(10000000);
+        config.setMaxHttpContentLength(10000000);
         config.setPort(3000);
         final SocketIOServer server = new SocketIOServer(config);
-
         server.addEventListener("request", DTO.class, new DataListener<DTO>() {
             Connection conn = new WebService();
 
@@ -76,7 +77,6 @@ public class Launcher {
                 try {
                     response.setType(data.getType());
                     response.setData("true");
-                    Connection conn = new WebService();
                     conn.AttachmentIns(data.getSql(), data.getKey(), data.getData());
                 } catch (Exception e) {
                     response.setError(e.getMessage());

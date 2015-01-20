@@ -52,11 +52,7 @@ public class MultiplyExecDTO {
     }
 
     public void setSqlList(String[] sqlList) {
-        String[] prepareData = new String[sqlList.length];
-        for(int i = 0; i< sqlList.length; i++){
-            prepareData[i] = DTO.convertToUTF8(sqlList[i]);
-        }
-        this.sqlList = prepareData;
+        this.sqlList = sqlList;
     }
 
     public String getError() {
