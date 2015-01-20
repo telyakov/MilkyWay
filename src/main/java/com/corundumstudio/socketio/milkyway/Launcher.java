@@ -75,6 +75,7 @@ public class Launcher {
             public void onData(SocketIOClient client, FileDTO data, AckRequest ackRequest) {
                 DTO response = new DTO();
                 try {
+                    response.setId(data.getName());
                     response.setType(data.getType());
                     response.setData("true");
                     conn.AttachmentIns(data.getSql(), data.getKey(), data.getData());
