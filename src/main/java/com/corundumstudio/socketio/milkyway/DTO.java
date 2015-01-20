@@ -8,11 +8,12 @@ public class DTO {
     private String query;
     private String error;
     private String key;
+    private Boolean isCache = false;
 
     public DTO() {
     }
 
-    public DTO(String id, String type, String query, String data, String error, String key) {
+    public DTO(String id, String type, String query, String data, String error, String key, Boolean isCache) {
         super();
         this.id = id;
         this.type = type;
@@ -20,7 +21,20 @@ public class DTO {
         this.query = query;
         this.error = error;
         this.key = key;
+        this.isCache = isCache;
     }
+
+    public Boolean getIsCache() {
+        return isCache;
+    }
+
+//    public boolean isNeedCache(){
+//        return  this.getIsCache() == "1";
+//    }
+    public void setIsCache(Boolean isCache) {
+        this.isCache = isCache;
+    }
+
     public String getKey() {
         return key;
     }

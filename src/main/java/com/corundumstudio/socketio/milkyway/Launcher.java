@@ -34,10 +34,11 @@ public class Launcher {
                 try {
                     response.setId(data.getId());
                     response.setType(data.getType());
-                    LinkedHashMap<String, HashMap<String, String>> result = conn.Exec(data.getQuery(), data.getKey());
+                    LinkedHashMap<String, HashMap<String, String>> result = conn.Exec(data.getQuery(), data.getKey(), data.getIsCache());
                     Gson gson = new GsonBuilder().serializeNulls().create();
                     String json = gson.toJson(result);
                     response.setData(json);
+                    response.setIsCache(data.getIsCache());
                 } catch (Exception e) {
                     response.setError(e.getMessage());
 
@@ -119,7 +120,7 @@ public class Launcher {
                     response.setName(data.getName());
                     response.setType(data.getType());
                     String sql = "core.XmlFileGet '" + data.getName() + "'";
-                    LinkedHashMap<String,HashMap<String,String>> result = conn.Exec(sql, data.getKey());
+                    LinkedHashMap<String,HashMap<String,String>> result = conn.Exec(sql, data.getKey(), false);
                     HashMap<String, String> row = conn.getRow(result, 0);
                     response.setId(data.getId());
                     data.setId(Integer.parseInt(row.get("id")));

@@ -3,34 +3,34 @@ package test.com.corundumstudio.socketio.milkyway.connection;
 import com.corundumstudio.socketio.milkyway.connection.WebService;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import junit.framework.Assert;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 
-public class WebServiceTest { 
+public class WebServiceTest {
 
-@Before
-public void before() throws Exception { 
-} 
+    @Before
+    public void before() throws Exception {
+    }
 
-@After
-public void after() throws Exception { 
-} 
+    @After
+    public void after() throws Exception {
+    }
 
-/** 
-* 
-* Method: Exec(String sql) 
-* 
-*/ 
+/**
+ *
+ * Method: Exec(String sql)
+ *
+ */
 @Test
 public void testExecOneRow() throws Exception {
     WebService conn = new WebService();
     String oneRowSelect = "select 1 as id";
-    LinkedHashMap<String, HashMap<String,String>> result = conn.Exec(oneRowSelect, "test6543210");
+    LinkedHashMap<String, HashMap<String,String>> result = conn.Exec(oneRowSelect, "test6543210", false);
 
     Gson gson = new GsonBuilder().serializeNulls().create();
     String json = gson.toJson(result);
@@ -42,7 +42,7 @@ public void testExecOneRow() throws Exception {
 
 
         String twoRowSelect = "Select 33 as ID, 1 as Name UNION SELECT 44, 2";
-        LinkedHashMap<String, HashMap<String,String>> result = conn.Exec(twoRowSelect, "test6543210");
+        LinkedHashMap<String, HashMap<String,String>> result = conn.Exec(twoRowSelect, "test6543210", false);
 
         Gson gson = new GsonBuilder().serializeNulls().create();
         String json = gson.toJson(result);
@@ -52,7 +52,7 @@ public void testExecOneRow() throws Exception {
     public void testGetRow() throws Exception {
         WebService webService = new WebService();
         String sql = "Select 'test' as name";
-        LinkedHashMap<String,HashMap<String,String>> result = webService.Exec(sql, "test6543210");
+        LinkedHashMap<String,HashMap<String,String>> result = webService.Exec(sql, "test6543210", false);
         HashMap<String, String> firstRow = webService.getRow(result, 0);
         HashMap<String, String> secondRow = webService.getRow(result, 1);
         Assert.assertEquals(firstRow.get("name"), "test");

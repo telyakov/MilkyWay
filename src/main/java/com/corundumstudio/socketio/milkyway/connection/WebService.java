@@ -19,9 +19,14 @@ public class WebService implements Connection {
     }
 
     @Override
-    public LinkedHashMap<String, HashMap<String, String>> Exec(String sql, String key) throws ConnectionException {
+    public LinkedHashMap<String, HashMap<String, String>> Exec(String sql, String key, Boolean isCache) throws ConnectionException {
         try {
-            ArrayOfString data = this.getConn().exec2(key, sql, "", "", "", "", "");
+            ArrayOfString data;
+            if(isCache){
+                data = this.getConn().exec2Immutable(key, sql, "", "", "", "", "");
+            }else{
+                data = this.getConn().exec2(key, sql, "", "", "", "", "");
+            }
             return WebService.parse(data);
         } catch (Exception e) {
             throw new ConnectionException(e.getMessage());

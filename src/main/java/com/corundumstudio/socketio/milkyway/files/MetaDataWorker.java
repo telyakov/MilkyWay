@@ -22,7 +22,7 @@ public class MetaDataWorker  implements Runnable{
     public void run() {
         try {
             String sql = "Attachments.MetaDataGet " + this.request.getId();
-            LinkedHashMap<String,HashMap<String,String>> result = conn.Exec(sql, this.request.getKey());
+            LinkedHashMap<String,HashMap<String,String>> result = conn.Exec(sql, this.request.getKey(), false);
             HashMap<String, String> row =conn.getRow(result, 0);
             this.dto.setName(row.get("name"));
             this.dto.setId(request.getId());
