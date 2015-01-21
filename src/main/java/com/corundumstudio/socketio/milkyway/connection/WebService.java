@@ -19,7 +19,7 @@ public class WebService implements Connection {
     }
 
     @Override
-    public LinkedHashMap<String, HashMap<String, String>> Exec(String sql, String key, Boolean isCache) throws ConnectionException {
+    public LinkedHashMap<String, HashMap<String, String>> Exec(String key, String sql, Boolean isCache) throws ConnectionException {
         try {
             ArrayOfString data;
             if(isCache){
@@ -27,9 +27,9 @@ public class WebService implements Connection {
             }else{
                 data = this.getConn().exec2(key, sql, "", "", "", "", "");
             }
-            return WebService.parse(data);
+            return parse(data);
         } catch (Exception e) {
-            throw new ConnectionException(e.getMessage());
+            throw new ConnectionException(e.getMessage(), e);
         }
     }
 
@@ -49,7 +49,7 @@ public class WebService implements Connection {
     }
 
     @Override
-    public byte[] FileGet(int id, String key) throws ConnectionException {
+    public byte[] FileGet(String key, int id) throws ConnectionException {
         try {
             List<FileModel> list = this.getConn().fileGet(key, id).getFileModel();
             if (list.isEmpty()) {
@@ -63,11 +63,11 @@ public class WebService implements Connection {
         }
     }
 
-    public boolean ExecMultiply(String[] sqlList, String key) throws ConnectionException {
+    public boolean ExecMultiply(String key, String[] sqlList) throws ConnectionException {
         try {
             ArrayOfString array = new ArrayOfString();
-            for (int i = 0; i < sqlList.length; i++) {
-                array.getString().add(sqlList[i]);
+            for (String aSqlList : sqlList) {
+                array.getString().add(aSqlList);
             }
             return this.getConn().execMultiply(key, array);
         } catch (Exception e) {
@@ -75,7 +75,7 @@ public class WebService implements Connection {
         }
     }
 
-    public void AttachmentIns(String sql, String key, byte[] data) throws ConnectionException{
+    public void AttachmentIns(String key, String sql, byte[] data) throws ConnectionException{
         try {
             this.getConn().attachmentIns(key, sql, data);
         } catch (Exception e) {
@@ -93,6 +93,9 @@ public class WebService implements Connection {
     }
 
     private static LinkedHashMap<String, HashMap<String, String>> parse(ArrayOfString data) {
+
+        LinkedHashMap<String, HashMap<String, String>> result = new LinkedHashMap<String, HashMap<String, String>>();
+
         List<String> list = data.getString();
         int columnsCount = Integer.parseInt(list.remove(0));
         String[] columns = new String[columnsCount];
@@ -111,7 +114,7 @@ public class WebService implements Connection {
         }
         int key = 0;
         int index;
-        LinkedHashMap<String, HashMap<String, String>> result = new LinkedHashMap<String, HashMap<String, String>>();
+
         HashMap<String, String> row = new HashMap<String, String>(columnsCount);
         for (String value : list) {
             index = key % columnsCount;

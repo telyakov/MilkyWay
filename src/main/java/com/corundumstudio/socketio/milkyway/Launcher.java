@@ -24,9 +24,10 @@ public class Launcher {
         config.setMaxFramePayloadLength(10000000);
         config.setMaxHttpContentLength(10000000);
         config.setPort(3000);
+        final Connection conn = new WebService();
         final SocketIOServer server = new SocketIOServer(config);
         server.addEventListener("request", DTO.class, new DataListener<DTO>() {
-            Connection conn = new WebService();
+
 
             @Override
             public void onData(SocketIOClient client, DTO data, AckRequest ackRequest) {
@@ -34,7 +35,7 @@ public class Launcher {
                 try {
                     response.setId(data.getId());
                     response.setType(data.getType());
-                    LinkedHashMap<String, HashMap<String, String>> result = conn.Exec(data.getQuery(), data.getKey(), data.getIsCache());
+                    LinkedHashMap<String, HashMap<String, String>> result = conn.Exec(data.getKey(), data.getQuery(), data.getIsCache());
                     Gson gson = new GsonBuilder().serializeNulls().create();
                     String json = gson.toJson(result);
                     response.setData(json);
@@ -49,15 +50,13 @@ public class Launcher {
         });
 
         server.addEventListener("execMultiply", MultiplyExecDTO.class, new DataListener<MultiplyExecDTO>() {
-            Connection conn = new WebService();
-
             @Override
             public void onData(SocketIOClient client, MultiplyExecDTO data, AckRequest ackRequest) {
                 MultiplyExecDTO response = new MultiplyExecDTO();
                 try {
                     response.setId(data.getId());
                     response.setType(data.getType());
-                    Boolean success = conn.ExecMultiply(data.getSqlList(), data.getKey());
+                    Boolean success = conn.ExecMultiply( data.getKey(), data.getSqlList());
                     response.setData( success.toString());
                     if(!success){
                         response.setError("Unknown server error");
@@ -71,7 +70,7 @@ public class Launcher {
             }
         });
         server.addEventListener("fileUpload", FileDTO.class, new DataListener<FileDTO>() {
-            Connection conn = new WebService();
+//            Connection conn = new WebService();
             @Override
             public void onData(SocketIOClient client, FileDTO data, AckRequest ackRequest) {
                 DTO response = new DTO();
@@ -79,7 +78,7 @@ public class Launcher {
                     response.setId(data.getName());
                     response.setType(data.getType());
                     response.setData("true");
-                    conn.AttachmentIns(data.getSql(), data.getKey(), data.getData());
+                    conn.AttachmentIns(data.getKey(), data.getSql(), data.getData());
                 } catch (Exception e) {
                     response.setError(e.getMessage());
 
@@ -90,8 +89,6 @@ public class Launcher {
         });
 
         server.addEventListener("fileRequest", FileDTO.class, new DataListener<FileDTO>() {
-            Connection conn = new WebService();
-
             @Override
             public void onData(SocketIOClient client, FileDTO data, AckRequest ackRequest) {
                 FileDTO response = new FileDTO();
@@ -111,8 +108,6 @@ public class Launcher {
             }
         });
         server.addEventListener("xmlRequest", FileDTO.class, new DataListener<FileDTO>() {
-            Connection conn = new WebService();
-
             @Override
             public void onData(SocketIOClient client, FileDTO data, AckRequest ackRequest) {
                 FileDTO response = new FileDTO();
@@ -120,7 +115,7 @@ public class Launcher {
                     response.setName(data.getName());
                     response.setType(data.getType());
                     String sql = "core.XmlFileGet '" + data.getName() + "'";
-                    LinkedHashMap<String,HashMap<String,String>> result = conn.Exec(sql, data.getKey(), false);
+                    LinkedHashMap<String,HashMap<String,String>> result = conn.Exec(data.getKey(), sql, false);
                     HashMap<String, String> row = conn.getRow(result, 0);
                     response.setId(data.getId());
                     data.setId(Integer.parseInt(row.get("id")));
