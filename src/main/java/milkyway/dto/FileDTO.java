@@ -1,4 +1,4 @@
-package milkyway;
+package milkyway.dto;
 
 public class FileDTO {
     private byte[] data;

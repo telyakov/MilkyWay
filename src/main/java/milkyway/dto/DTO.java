@@ -1,26 +1,35 @@
-package milkyway;
+package milkyway.dto;
 
-
-public class MultiplyExecDTO {
+public class DTO {
 
     private String data;
     private String id;
     private String type;
-    private String[] sqlList;
+    private String query;
     private String error;
     private String key;
+    private Boolean isCache = false;
 
-    public MultiplyExecDTO() {
+    public DTO() {
     }
 
-    public MultiplyExecDTO(String id, String type, String[] sqlList, String data, String error, String key) {
+    public DTO(String id, String type, String query, String data, String error, String key, Boolean isCache) {
         super();
         this.id = id;
         this.type = type;
         this.data = data;
-        this.sqlList = sqlList;
+        this.query = query;
         this.error = error;
         this.key = key;
+        this.isCache = isCache;
+    }
+
+    public Boolean getIsCache() {
+        return isCache;
+    }
+
+    public void setIsCache(Boolean isCache) {
+        this.isCache = isCache;
     }
 
     public String getKey() {
@@ -47,12 +56,12 @@ public class MultiplyExecDTO {
         this.type = type;
     }
 
-    public String[] getSqlList() {
-        return sqlList;
+    public String getQuery() {
+        return query;
     }
 
-    public void setSqlList(String[] sqlList) {
-        this.sqlList = sqlList;
+    public void setQuery(String query) {
+        this.query = query;
     }
 
     public String getError() {
@@ -71,5 +80,4 @@ public class MultiplyExecDTO {
     public void setData(String data) {
         this.data = data;
     }
-
 }
