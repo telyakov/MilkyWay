@@ -86,7 +86,7 @@ public class Launcher {
         });
     }
 
-    private static void addFileRequestEventListener(SocketIOServer server, final Connection conn){
+    private static void addFileRequestEventListener(SocketIOServer server, final Connection conn) {
         server.addEventListener("fileRequest", FileDTO.class, new DataListener<FileDTO>() {
             @Override
             public void onData(SocketIOClient client, FileDTO data, AckRequest ackRequest) {
@@ -108,7 +108,7 @@ public class Launcher {
         });
     }
 
-    private static void addXmlRequestEventListener(SocketIOServer server, final Connection conn){
+    private static void addXmlRequestEventListener(SocketIOServer server, final Connection conn) {
         server.addEventListener("xmlRequest", FileDTO.class, new DataListener<FileDTO>() {
             @Override
             public void onData(SocketIOClient client, FileDTO data, AckRequest ackRequest) {
@@ -149,9 +149,12 @@ public class Launcher {
         Launcher.addFileRequestEventListener(server, conn);
         Launcher.addXmlRequestEventListener(server, conn);
 
-        server.start();
-        Thread.sleep(Integer.MAX_VALUE);
-        server.stop();
+        try {
+            server.start();
+            Thread.sleep(Integer.MAX_VALUE);
+        } catch (Exception e) {
+            server.stop();
+        }
 
     }
 
