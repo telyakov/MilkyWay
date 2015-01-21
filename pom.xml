@@ -9,7 +9,7 @@
     <inceptionYear>2014</inceptionYear>
 
     <properties>
-        <main.class>com.corundumstudio.socketio.milkyway.Launcher</main.class>
+        <main.class>milkyway.Launcher</main.class>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
     <dependencies>
