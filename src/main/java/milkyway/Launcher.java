@@ -20,18 +20,8 @@ import java.util.LinkedHashMap;
 
 public class Launcher {
 
-    public static void main(String[] args) throws InterruptedException {
-
-        Configuration config = new Configuration();
-        config.setHostname("192.168.0.34");
-        config.setMaxFramePayloadLength(10000000);
-        config.setMaxHttpContentLength(10000000);
-        config.setPort(3000);
-        final Connection conn = new WebServiceAccessor();
-        final SocketIOServer server = new SocketIOServer(config);
+    private static void addRequestEventListener(SocketIOServer server, final Connection conn) {
         server.addEventListener("request", DTO.class, new DataListener<DTO>() {
-
-
             @Override
             public void onData(SocketIOClient client, DTO data, AckRequest ackRequest) {
                 DTO response = new DTO();
@@ -51,7 +41,9 @@ public class Launcher {
                 }
             }
         });
+    }
 
+    private static void addExecMultiplyEventListener(SocketIOServer server, final Connection conn) {
         server.addEventListener("execMultiply", MultiplyExecDTO.class, new DataListener<MultiplyExecDTO>() {
             @Override
             public void onData(SocketIOClient client, MultiplyExecDTO data, AckRequest ackRequest) {
@@ -59,9 +51,9 @@ public class Launcher {
                 try {
                     response.setId(data.getId());
                     response.setType(data.getType());
-                    Boolean success = conn.ExecMultiply( data.getKey(), data.getSqlList());
-                    response.setData( success.toString());
-                    if(!success){
+                    Boolean success = conn.ExecMultiply(data.getKey(), data.getSqlList());
+                    response.setData(success.toString());
+                    if (!success) {
                         response.setError("Unknown server error");
                     }
                 } catch (Exception e) {
@@ -72,8 +64,10 @@ public class Launcher {
                 }
             }
         });
+    }
+
+    private static void addFileUploadEventListener(SocketIOServer server, final Connection conn) {
         server.addEventListener("fileUpload", FileDTO.class, new DataListener<FileDTO>() {
-//            Connection conn = new WebServiceAccessor();
             @Override
             public void onData(SocketIOClient client, FileDTO data, AckRequest ackRequest) {
                 DTO response = new DTO();
@@ -90,7 +84,9 @@ public class Launcher {
                 }
             }
         });
+    }
 
+    private static void addFileRequestEventListener(SocketIOServer server, final Connection conn){
         server.addEventListener("fileRequest", FileDTO.class, new DataListener<FileDTO>() {
             @Override
             public void onData(SocketIOClient client, FileDTO data, AckRequest ackRequest) {
@@ -110,6 +106,9 @@ public class Launcher {
                 }
             }
         });
+    }
+
+    private static void addXmlRequestEventListener(SocketIOServer server, final Connection conn){
         server.addEventListener("xmlRequest", FileDTO.class, new DataListener<FileDTO>() {
             @Override
             public void onData(SocketIOClient client, FileDTO data, AckRequest ackRequest) {
@@ -118,7 +117,7 @@ public class Launcher {
                     response.setName(data.getName());
                     response.setType(data.getType());
                     String sql = "core.XmlFileGet '" + data.getName() + "'";
-                    LinkedHashMap<String,HashMap<String,String>> result = conn.Exec(data.getKey(), sql, false);
+                    LinkedHashMap<String, HashMap<String, String>> result = conn.Exec(data.getKey(), sql, false);
                     HashMap<String, String> row = conn.getRow(result, 0);
                     response.setId(data.getId());
                     data.setId(Integer.parseInt(row.get("id")));
@@ -133,6 +132,23 @@ public class Launcher {
                 }
             }
         });
+    }
+
+    public static void main(String[] args) throws InterruptedException {
+
+        Configuration config = new Configuration();
+        config.setHostname("192.168.0.34");
+        config.setMaxFramePayloadLength(10000000);
+        config.setMaxHttpContentLength(10000000);
+        config.setPort(3000);
+        final Connection conn = new WebServiceAccessor();
+        final SocketIOServer server = new SocketIOServer(config);
+        Launcher.addRequestEventListener(server, conn);
+        Launcher.addExecMultiplyEventListener(server, conn);
+        Launcher.addFileUploadEventListener(server, conn);
+        Launcher.addFileRequestEventListener(server, conn);
+        Launcher.addXmlRequestEventListener(server, conn);
+
         server.start();
         Thread.sleep(Integer.MAX_VALUE);
         server.stop();

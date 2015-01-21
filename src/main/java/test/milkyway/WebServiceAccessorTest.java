@@ -1,4 +1,4 @@
-package test.com.corundumstudio.socketio.milkyway.connection;
+package test.milkyway;
 
 import milkyway.connection.WebServiceAccessor;
 import com.google.gson.Gson;
