@@ -1,7 +1,7 @@
 package milkyway.files;
 
-import milkyway.dto.FileDTO;
 import milkyway.connection.Connection;
+import milkyway.dto.FileDTO;
 
 public class BlobWorker implements Runnable {
     private FileDTO dto;

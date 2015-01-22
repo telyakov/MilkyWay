@@ -1,7 +1,10 @@
 package milkyway.connection;
 
 import milkyway.exceptions.ConnectionException;
-import milkyway.soap.*;
+import milkyway.soap.ArrayOfString;
+import milkyway.soap.Directory;
+import milkyway.soap.DirectorySoap;
+import milkyway.soap.FileModel;
 
 import java.util.*;
 

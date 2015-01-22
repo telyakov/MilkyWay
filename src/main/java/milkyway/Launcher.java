@@ -5,6 +5,8 @@ import com.corundumstudio.socketio.Configuration;
 import com.corundumstudio.socketio.SocketIOClient;
 import com.corundumstudio.socketio.SocketIOServer;
 import com.corundumstudio.socketio.listener.DataListener;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import milkyway.connection.Connection;
 import milkyway.connection.WebServiceAccessor;
 import milkyway.dto.DTO;
@@ -12,13 +14,35 @@ import milkyway.dto.FileDTO;
 import milkyway.dto.MultiplyExecDTO;
 import milkyway.files.BlobWorker;
 import milkyway.files.MetaDataWorker;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 
 public class Launcher {
+
+    public static void main(String[] args) throws InterruptedException {
+
+        Configuration config = new Configuration();
+        config.setHostname("192.168.0.34");
+        config.setMaxFramePayloadLength(10000000);
+        config.setMaxHttpContentLength(10000000);
+        config.setPort(3000);
+        final Connection conn = new WebServiceAccessor();
+        final SocketIOServer server = new SocketIOServer(config);
+        Launcher.addRequestEventListener(server, conn);
+        Launcher.addExecMultiplyEventListener(server, conn);
+        Launcher.addFileUploadEventListener(server, conn);
+        Launcher.addFileRequestEventListener(server, conn);
+        Launcher.addXmlRequestEventListener(server, conn);
+
+        try {
+            server.start();
+            Thread.sleep(Integer.MAX_VALUE);
+        } catch (Exception e) {
+            server.stop();
+        }
+
+    }
 
     private static void addRequestEventListener(SocketIOServer server, final Connection conn) {
         server.addEventListener("request", DTO.class, new DataListener<DTO>() {
@@ -134,28 +158,6 @@ public class Launcher {
         });
     }
 
-    public static void main(String[] args) throws InterruptedException {
 
-        Configuration config = new Configuration();
-        config.setHostname("192.168.0.34");
-        config.setMaxFramePayloadLength(10000000);
-        config.setMaxHttpContentLength(10000000);
-        config.setPort(3000);
-        final Connection conn = new WebServiceAccessor();
-        final SocketIOServer server = new SocketIOServer(config);
-        Launcher.addRequestEventListener(server, conn);
-        Launcher.addExecMultiplyEventListener(server, conn);
-        Launcher.addFileUploadEventListener(server, conn);
-        Launcher.addFileRequestEventListener(server, conn);
-        Launcher.addXmlRequestEventListener(server, conn);
-
-        try {
-            server.start();
-            Thread.sleep(Integer.MAX_VALUE);
-        } catch (Exception e) {
-            server.stop();
-        }
-
-    }
 
 }
