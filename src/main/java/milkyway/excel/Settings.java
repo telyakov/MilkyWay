@@ -22,7 +22,8 @@ public class Settings {
             String key = jsonSetting.get("key").getAsString();
             Integer width = jsonSetting.get("width").getAsInt();
             Integer weight = jsonSetting.get("weight").getAsInt();
-            ColumnSettings columnSettings = new ColumnSettings(key, width, weight);
+            String caption = jsonSetting.get("caption").getAsString();
+            ColumnSettings columnSettings = new ColumnSettings(key, width, weight, caption);
             map.put(key, columnSettings);
         };
         this.map = map;

@@ -10,8 +10,12 @@ import com.google.gson.GsonBuilder;
 import milkyway.connection.Connection;
 import milkyway.connection.WebServiceAccessor;
 import milkyway.dto.DTO;
+import milkyway.dto.ExcelDTO;
 import milkyway.dto.FileDTO;
 import milkyway.dto.MultiplyExecDTO;
+import milkyway.excel.ExcelBuilder;
+import milkyway.excel.FormData;
+import milkyway.excel.Settings;
 import milkyway.files.BlobWorker;
 import milkyway.files.MetaDataWorker;
 
@@ -34,6 +38,7 @@ public class Launcher {
         Launcher.addFileUploadEventListener(server, conn);
         Launcher.addFileRequestEventListener(server, conn);
         Launcher.addXmlRequestEventListener(server, conn);
+        Launcher.addExportToExcelEventListener(server);
 
         try {
             server.start();
@@ -158,6 +163,28 @@ public class Launcher {
         });
     }
 
+    private static void addExportToExcelEventListener(SocketIOServer server) {
+        final ExcelBuilder excelBuilder = new ExcelBuilder();
+        server.addEventListener("exportToExcel", ExcelDTO.class, new DataListener<ExcelDTO>() {
+            @Override
+            public void onData(SocketIOClient client, ExcelDTO data, AckRequest ackRequest) {
+                FileDTO response = new FileDTO();
+                try {
+                    response.setName(data.getName());
+                    response.setType(data.getType());
+                    response.setId(data.getId());
+                    FormData formData = new FormData(data.getData());
+                    Settings settings = new Settings(data.getSettings());
+                    byte[] buffer = excelBuilder.makeExcel(formData, settings);
+                    response.setData(buffer);
+                } catch (Exception e) {
+                    response.setError(e.getMessage());
 
+                } finally {
+                    client.sendEvent("fileResponse", response);
+                }
+            }
+        });
+    }
 
 }

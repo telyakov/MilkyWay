@@ -10,7 +10,7 @@ public class SettingsTest extends TestCase {
 
     @Test
     public void testSettings()throws Exception{
-        String json = "{\"chocolate-control-column\":{\"weight\":\"0\",\"key\":\"chocolate-control-column\",\"width\":\"24\"},\"numattachments\":{\"weight\":\"2\",\"key\":\"numattachments\",\"width\":\"120\"}}";
+        String json = "{\"chocolate-control-column\":{\"weight\":\"0\",\"caption\":\"cap1\",\"key\":\"chocolate-control-column\",\"width\":\"24\"},\"numattachments\":{\"weight\":\"2\",\"caption\":\"cap2\", \"key\":\"numattachments\",\"width\":\"120\"}}";
         Settings settings = new Settings(json);
         ColumnSettings columnSettings = settings.getColumnSettings("numattachments");
         Assert.assertNotNull(columnSettings);

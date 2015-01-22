@@ -22,7 +22,12 @@ public class FormData {
             HashMap<String, String> row = new HashMap<String, String>();
             JsonObject rowJsonObject= entry.getValue().getAsJsonObject();
             for (Map.Entry<String, JsonElement> rowJson : rowJsonObject.entrySet()) {
-                row.put(rowJson.getKey(), rowJson.getValue().getAsString());
+                if(rowJson.getValue().isJsonNull()){
+                    row.put(rowJson.getKey(), "");
+
+                }else{
+                    row.put(rowJson.getKey(), rowJson.getValue().getAsString());
+                }
             }
             map.put(key, row);
         };

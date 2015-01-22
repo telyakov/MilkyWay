@@ -40,10 +40,17 @@ public class ExcelBuilder {
 
     private void writeDataSheet(WritableSheet sheet, FormData data, Settings settings) throws WriteException {
         LinkedHashMap<String, HashMap<String, String>> map = data.getMap();
+        HashMap<String, ColumnSettings> settingsMap = settings.getMap();
+        for (ColumnSettings columnSettings : settingsMap.values()) {
+            String columnKey = columnSettings.getKey();
+            Label label = new Label(columnSettings.getWeight(), 0, columnSettings.getCaption());
+            sheet.addCell(label);
+        }
         int i = 0;
         for (Map.Entry<String, HashMap<String, String>> entry : map.entrySet()) {
+            i++;
             HashMap<String, String> rowData = entry.getValue();
-            for (ColumnSettings columnSettings : settings.getMap().values()) {
+            for (ColumnSettings columnSettings : settingsMap.values()) {
                 String columnKey = columnSettings.getKey();
                 String text = rowData.get(columnKey);
                 if (text != null) {
@@ -51,7 +58,6 @@ public class ExcelBuilder {
                     sheet.addCell(label);
                 }
             }
-            i++;
         }
 
     }
