@@ -1,5 +1,7 @@
 package milkyway.connection;
 
+import milkyway.exceptions.ConnectionException;
+
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 

@@ -1,8 +1,10 @@
 package test.milkyway;
 
-import milkyway.connection.WebServiceAccessor;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import milkyway.connection.WebServiceAccessor;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -12,7 +14,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 
 public class WebServiceAccessorTest {
-    final String testKey = "test6543210";
+    final static String testKey = "test6543210";
 
     @Before
     public void before() throws Exception {
@@ -40,6 +42,20 @@ public class WebServiceAccessorTest {
         Gson gson = new GsonBuilder().serializeNulls().create();
         String json = gson.toJson(result);
         Assert.assertEquals("{\"33\":{\"id\":\"33\",\"name\":\"шоколад\"},\"44\":{\"id\":\"44\",\"name\":\"kis\"}}", json);
+    }
+    @Test
+    public void testJsonParse() throws Exception {
+        WebServiceAccessor conn = new WebServiceAccessor();
+        String twoRowSelect = "Select 33 as ID, 'шоколад' as Name UNION SELECT 44, 'kis'";
+        LinkedHashMap<String, HashMap<String, String>> result = conn.Exec(testKey, twoRowSelect, false);
+        Gson gson = new GsonBuilder().serializeNulls().create();
+        String json = gson.toJson(result);
+        JsonObject object = new JsonParser().parse(json).getAsJsonObject();
+        JsonObject s1 = object.get("44").getAsJsonObject();
+        Integer id = s1.get("id").getAsInt();
+        String name = s1.get("name").getAsString();
+        Assert.assertEquals(name, "kis");
+        Assert.assertEquals(id.toString(), "44");
     }
 
     @Test

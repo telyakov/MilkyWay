@@ -1,5 +1,6 @@
 package milkyway.connection;
 
+import milkyway.exceptions.ConnectionException;
 import milkyway.soap.*;
 
 import java.util.*;
