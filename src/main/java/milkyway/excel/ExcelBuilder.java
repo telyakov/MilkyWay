@@ -42,7 +42,6 @@ public class ExcelBuilder {
         LinkedHashMap<String, HashMap<String, String>> map = data.getMap();
         HashMap<String, ColumnSettings> settingsMap = settings.getMap();
         for (ColumnSettings columnSettings : settingsMap.values()) {
-            String columnKey = columnSettings.getKey();
             Label label = new Label(columnSettings.getWeight(), 0, columnSettings.getCaption());
             sheet.addCell(label);
         }
