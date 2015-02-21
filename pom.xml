@@ -50,6 +50,11 @@
             <artifactId>commons-daemon</artifactId>
             <version>1.0.15</version>
         </dependency>
+        <dependency>
+            <groupId>org.docx4j</groupId>
+            <artifactId>docx4j</artifactId>
+            <version>3.0.0</version>
+        </dependency>
     </dependencies>
 
 
@@ -73,6 +78,8 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.1</version>
             </plugin>
+
+
 
 
         </plugins>
