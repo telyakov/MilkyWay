@@ -16,34 +16,36 @@ public class DocBuilderTest extends TestCase {
 
     @Test
     public void test_Tag_Replacing() throws Docx4JException, FileNotFoundException {
-        // Создать пакет
+
         WordprocessingMLPackage template = WordprocessingMLPackage.createPackage();
 
         MainDocumentPart document = template.getMainDocumentPart();
 
+        //Add test tags.
         document.addParagraphOfText("[a]");
         document.addParagraphOfText("[b]");
         document.addParagraphOfText("[Договор,  #Цена_м2_Общая_проектная, СуммаПрописьюБухФорматЛСТ#]");
 
         DocBuilder docBuilder = new DocBuilder();
 
+        //Replace tags.
         docBuilder.replacePlaceholder(template, "[a]", "1");
         docBuilder.replacePlaceholder(template, "[b]", "2");
         docBuilder.replacePlaceholder(template, "[Договор,  #Цена_м2_Общая_проектная, СуммаПрописьюБухФорматЛСТ#]", "Сто рублей, 00 копеек.");
 
+        //Check results.
         List<Object> texts = docBuilder.getAllElementFromObject(document, Text.class);
         assertEquals("После замены трех тегов, ожидалось три текстовых элемента.",3,texts.size());
         assertEquals("1", ((Text) texts.get(0)).getValue());
         assertEquals("2",((Text)texts.get(1)).getValue());
         assertEquals("Сто рублей, 00 копеек.",((Text)texts.get(2)).getValue());
 
-        // Сохранить его
+        //Save to file for manual check.
         template.save(new java.io.File("helloworld.docx"));
     }
 
     @Test
     public void test_Template_To_Result_For_Manual_Check() throws Exception {
-
 
         DocBuilder docBuilder = new DocBuilder();
 
@@ -57,13 +59,13 @@ public class DocBuilderTest extends TestCase {
         //225323 - Рекламная планировка квартиры
         //223740 - Планировка с осями
 
-
-
         WebServiceAccessor webServiceAccessor = new WebServiceAccessor();
-        byte[] bytes =  webServiceAccessor.FileGet("test6543210", 223740);
-        docBuilder.addImageToPackage(template, bytes);
+        docBuilder.addImageToPackage(template, webServiceAccessor.FileGet("test6543210", 225323));
+        template.getMainDocumentPart().addParagraphOfText("100% оплата/ипотека - 5 650 120 р. 3 этаж.");
+        docBuilder.addImageToPackage(template, webServiceAccessor.FileGet("test6543210", 223740));
+        template.getMainDocumentPart().addParagraphOfText("100% оплата/ипотека - 1 650 120 р. 2 этаж.");
 
-        // Сохранить его
+        //Save to file for manual check.
         template.save(new java.io.File("result.docx"));
     }
 

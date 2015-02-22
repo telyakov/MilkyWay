@@ -16,7 +16,6 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
-
 public class DocBuilder {
 
     public void replacePlaceholder(WordprocessingMLPackage template, String placeholder, String name) {
