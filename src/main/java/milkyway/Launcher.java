@@ -13,6 +13,7 @@ import milkyway.dto.DTO;
 import milkyway.dto.ExcelDTO;
 import milkyway.dto.FileDTO;
 import milkyway.dto.MultiplyExecDTO;
+import milkyway.excel.DocBuilder;
 import milkyway.excel.ExcelBuilder;
 import milkyway.excel.FormData;
 import milkyway.excel.Settings;
@@ -27,18 +28,21 @@ public class Launcher {
     public static void main(String[] args) throws InterruptedException {
 
         Configuration config = new Configuration();
-        config.setHostname("192.168.0.34");
+        config.getSocketConfig().setReuseAddress(true);
+        config.setHostname("localhost");
         config.setMaxFramePayloadLength(10000000);
         config.setMaxHttpContentLength(10000000);
-        config.setPort(3000);
+        config.setPort(3004);
         final Connection conn = new WebServiceAccessor();
         final SocketIOServer server = new SocketIOServer(config);
+        final DocBuilder docBuilder = new DocBuilder();
         Launcher.addRequestEventListener(server, conn);
         Launcher.addExecMultiplyEventListener(server, conn);
         Launcher.addFileUploadEventListener(server, conn);
         Launcher.addFileRequestEventListener(server, conn);
         Launcher.addXmlRequestEventListener(server, conn);
         Launcher.addExportToExcelEventListener(server);
+        Launcher.addDocumentBuilderEventListener(server, docBuilder);
 
         try {
             server.start();
@@ -47,6 +51,27 @@ public class Launcher {
             server.stop();
         }
 
+    }
+
+    private static void addDocumentBuilderEventListener(SocketIOServer server, final DocBuilder docBuilder ) {
+        server.addEventListener("documentBuilder", FileDTO.class, new DataListener<FileDTO>() {
+            @Override
+            public void onData(SocketIOClient client, FileDTO data, AckRequest ackRequest) {
+                FileDTO response = new FileDTO();
+                try {
+                    response.setId(data.getId());
+                    response.setType(data.getType());
+                    response.setName("document.docx");
+                    byte[] buffer = docBuilder.make(null, null);
+                    response.setData(buffer);
+                } catch (Exception e) {
+                    response.setError(e.getMessage());
+
+                } finally {
+                    client.sendEvent("fileResponse", response);
+                }
+            }
+        });
     }
 
     private static void addRequestEventListener(SocketIOServer server, final Connection conn) {

@@ -39,25 +39,22 @@ public class DocBuilder {
 
             //Шаблон по Гатчине в формате docx
             int templateID = 256207;
-
             int flatImageID = 223740;
 
-            String fileName = "kp.docx";
             WebServiceAccessor webServiceAccessor = new WebServiceAccessor();
-            Path file = Paths.get(fileName);
             byte[] buf = webServiceAccessor.FileGet("test6543210", templateID);
-            Files.write(file, buf);
-
             DocBuilder docBuilder = new DocBuilder();
-            WordprocessingMLPackage template = docBuilder.getTemplate(fileName);
 
-            docBuilder.addImageToPackage(template,"Квартира_Планировка", webServiceAccessor.FileGet("test6543210", flatImageID));
+            ByteArrayInputStream byteStream = new ByteArrayInputStream(buf);
+            WordprocessingMLPackage template = WordprocessingMLPackage.load(byteStream);
 
-            template.save(new java.io.File("kp_result.docx"));
+            docBuilder.addImageToPackage(template, "Квартира_Планировка", webServiceAccessor.FileGet("test6543210", flatImageID));
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 
-            Path resultPath = Paths.get("kp_result.docx");
-            result = Files.readAllBytes(resultPath);
+            template.getMainDocumentPart().addParagraphOfText("100% оплата/ипотека - 1 650 120 р. 2 этаж.");
 
+            template.save(outputStream);
+            result = outputStream.toByteArray();
 
         } catch (Exception e) {
             throw new ExcelBuilderException(e.getMessage(), e);
