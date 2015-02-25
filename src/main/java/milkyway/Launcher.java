@@ -29,10 +29,10 @@ public class Launcher {
 
         Configuration config = new Configuration();
         config.getSocketConfig().setReuseAddress(true);
-        config.setHostname("localhost");
+        config.setHostname("192.168.0.34");
         config.setMaxFramePayloadLength(10000000);
         config.setMaxHttpContentLength(10000000);
-        config.setPort(3004);
+        config.setPort(3000);
         final Connection conn = new WebServiceAccessor();
         final SocketIOServer server = new SocketIOServer(config);
         final DocBuilder docBuilder = new DocBuilder();
