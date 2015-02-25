@@ -44,7 +44,7 @@ public class DocBuilder {
     }
 
 
-    public DocBuilderResult make(DocSettings docSettings, FileDTO response) throws ExcelBuilderException {
+    public DocBuilderResult make(DocSettings docSettings) throws ExcelBuilderException {
 
         DocBuilderResult result = new DocBuilderResult();
         result.setName("document.docx");
@@ -54,23 +54,29 @@ public class DocBuilder {
             //TODO Удалить все не подставленные теги.
 
             //Шаблон по Гатчине в формате docx
-            int templateID = 256207;
+            //int templateID = 256207;
             int flatImageID = 223740;
 
             WebServiceAccessor webServiceAccessor = new WebServiceAccessor();
-            byte[] buf = webServiceAccessor.FileGet("test6543210", templateID);
+
+            String flatID = docSettings.get("flatID");
+            String sql = "select f.ObjectParentID from directory.vFlats f where f.id=" + flatID.toString();
+            String mainObjectID = webServiceAccessor.ExecScalar("test6543210", sql, "9");
+            String templateID = webServiceAccessor.ExecScalar("test6543210", "select directory.ParameterValueGet (22,64," + mainObjectID + ")", "9");
+
+
+            byte[] buf = webServiceAccessor.FileGet("test6543210", Integer.valueOf(templateID));
             DocBuilder docBuilder = new DocBuilder();
 
             ByteArrayInputStream byteStream = new ByteArrayInputStream(buf);
             WordprocessingMLPackage template = WordprocessingMLPackage.load(byteStream);
 
-            docBuilder.addImageToPackage(template, "Квартира_Планировка", webServiceAccessor.FileGet("test6543210", flatImageID));
+            docBuilder.addImage(template, "Квартира_Планировка", webServiceAccessor.FileGet("test6543210", flatImageID));
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 
             template.getMainDocumentPart().addParagraphOfText("100% оплата/ипотека - 1 650 120 р. 2 этаж.");
 
             template.save(outputStream);
-
             result.setResult(outputStream.toByteArray());
 
         } catch (Exception e) {
@@ -189,39 +195,11 @@ public class DocBuilder {
     }
 
     public WordprocessingMLPackage getTemplate(String name) throws Docx4JException, FileNotFoundException {
-        WordprocessingMLPackage template = WordprocessingMLPackage.load(new FileInputStream(new File(name)));
-        return template;
+        return WordprocessingMLPackage.load(new FileInputStream(new File(name)));
     }
 
-    /**
-     * Docx4j contains a utility method to create an image part from an array of
-     * bytes and then adds it to the given package. In order to be able to add this
-     * image to a paragraph, we have to convert it into an inline object. For this
-     * there is also a method, which takes a filename hint, an alt-text, two ids
-     * and an indication on whether it should be embedded or linked to.
-     * One id is for the drawing object non-visual properties of the document, and
-     * the second id is for the non visual drawing properties of the picture itself.
-     * Finally we add this inline object to the paragraph and the paragraph to the
-     * main document of the package.
-     *
-     * @param wordMLPackage The package we want to add the image to
-     * @param bytes         The bytes of the image
-     * @throws Exception Sadly the createImageInline method throws an Exception
-     *                   (and not a more specific exception type)
-     */
-    public void addImageToPackage(WordprocessingMLPackage wordMLPackage, byte[] bytes) throws Exception {
-        BinaryPartAbstractImage imagePart = BinaryPartAbstractImage.createImagePart(wordMLPackage, bytes);
 
-        int docPrId = 1;
-        int cNvPrId = 2;
-        Inline inline = imagePart.createImageInline("Filename hint", "Alternative text", docPrId, cNvPrId, false);
-
-        P paragraph = addInlineImageToParagraph(inline);
-
-        wordMLPackage.getMainDocumentPart().addObject(paragraph);
-    }
-
-    public void addImageToPackage(WordprocessingMLPackage wordMLPackage, String tagName, byte[] bytes) throws Exception {
+    public void addImage(WordprocessingMLPackage wordMLPackage, String tagName, byte[] bytes) throws Exception {
         BinaryPartAbstractImage imagePart = BinaryPartAbstractImage.createImagePart(wordMLPackage, bytes);
 
         int docPrId = 1;

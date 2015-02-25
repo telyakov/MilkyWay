@@ -5,6 +5,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import milkyway.connection.WebServiceAccessor;
+import milkyway.exceptions.ConnectionException;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -15,13 +16,16 @@ import java.util.LinkedHashMap;
 
 public class WebServiceAccessorTest {
     final static String testKey = "test6543210";
+    private WebServiceAccessor webServiceAccessor = null;
 
     @Before
     public void before() throws Exception {
+        this.webServiceAccessor = new WebServiceAccessor();
     }
 
     @After
     public void after() throws Exception {
+        this.webServiceAccessor = null;
     }
 
     @Test
@@ -97,5 +101,10 @@ public class WebServiceAccessorTest {
         } catch (Exception e) {
             Assert.assertTrue(e.getMessage().contains("Divide by zero error encountered"));
         }
+    }
+
+    @Test
+    public void testExecScalar() throws ConnectionException {
+        Assert.assertEquals("3",this.webServiceAccessor.ExecScalar(testKey,"select 1 + 2","1"));
     }
 }

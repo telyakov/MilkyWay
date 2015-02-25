@@ -26,8 +26,9 @@ public class Launcher {
 
         Configuration config = new Configuration();
         config.getSocketConfig().setReuseAddress(true);
-        config.setHostname("localhost");
-//        config.setHostname("192.168.0.34");
+        //config.setHostname("localhost");
+
+        config.setHostname("192.168.0.34");
         config.setMaxFramePayloadLength(10000000);
         config.setMaxHttpContentLength(10000000);
         config.setPort(3000);
@@ -195,11 +196,11 @@ public class Launcher {
             public void onData(SocketIOClient client, DocDTO request, AckRequest ackRequest) {
                 FileDTO response = new FileDTO();
                 try {
-//                    response.setId(request.getId());
+
                     response.setType(request.getType());
 
                     DocSettings docSettings = new DocSettings(request.getData());
-                    DocBuilder.DocBuilderResult docBuilderResult = docBuilder.make(docSettings, response);
+                    DocBuilder.DocBuilderResult docBuilderResult = docBuilder.make(docSettings);
 
                     response.setName(docBuilderResult.getName());
                     response.setData(docBuilderResult.getResult());

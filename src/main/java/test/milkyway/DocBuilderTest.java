@@ -3,20 +3,14 @@ package test.milkyway;
 import junit.framework.TestCase;
 import milkyway.connection.WebServiceAccessor;
 import milkyway.excel.DocBuilder;
-import milkyway.excel.SumToString;
-import milkyway.exceptions.ConnectionException;
+import milkyway.excel.DocSettings;
 import org.docx4j.openpackaging.exceptions.Docx4JException;
 import org.docx4j.openpackaging.packages.WordprocessingMLPackage;
 import org.docx4j.openpackaging.parts.WordprocessingML.MainDocumentPart;
 import org.docx4j.wml.Text;
 import org.junit.Test;
 
-import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 
 public class DocBuilderTest extends TestCase {
@@ -85,13 +79,13 @@ public class DocBuilderTest extends TestCase {
         //223740 - Планировка с осями
 
         WebServiceAccessor webServiceAccessor = new WebServiceAccessor();
-        docBuilder.addImageToPackage(template,"Квартира_Планировка", webServiceAccessor.FileGet("test6543210", 223740));
+        docBuilder.addImage(template, "Квартира_Планировка", webServiceAccessor.FileGet("test6543210", 223740));
 
 
-        //docBuilder.addImageToPackage(template, webServiceAccessor.FileGet("test6543210", 225323));
+        //docBuilder.addImage(template, webServiceAccessor.FileGet("test6543210", 225323));
 
         //template.getMainDocumentPart().addParagraphOfText("100% оплата/ипотека - 5 650 120 р. 3 этаж.");
-        //docBuilder.addImageToPackage(template, webServiceAccessor.FileGet("test6543210", 223740));
+        //docBuilder.addImage(template, webServiceAccessor.FileGet("test6543210", 223740));
         //template.getMainDocumentPart().addParagraphOfText("100% оплата/ипотека - 1 650 120 р. 2 этаж.");
 
         //Save to file for manual check.
@@ -104,7 +98,9 @@ public class DocBuilderTest extends TestCase {
     @Test
     public void test_Template() throws Exception
     {
-        assertTrue("Ожидался шаблон",(new DocBuilder()).make(null,null).getResult().length>1000);
+        DocSettings docSettings = new DocSettings("{\"flatID\":12805,\"templateID\":98}");
+
+        assertTrue("Ожидался шаблон",(new DocBuilder()).make(docSettings).getResult().length>1000);
     }
 
 

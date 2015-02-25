@@ -18,11 +18,4 @@ public class FormDataTest extends TestCase {
         Assert.assertEquals(row.get("key"), "numattachments");
     }
 
-    @Test
-    public void testFormData2()throws Exception{
-        String json ="{\"flatID\":12321412,\"templateID\":98}";
-        FormData data = new FormData(json);
-        LinkedHashMap<String, HashMap<String, String>> result = data.getMap();
-        String a = "";
-    }
 }
