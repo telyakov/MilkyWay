@@ -1,6 +1,6 @@
 package milkyway.dto;
 
-public class ExcelDTO {
+public class DocDTO {
     private Integer id;
     private String data;
     private String settings;
@@ -8,11 +8,11 @@ public class ExcelDTO {
     private String name;
     private String error;
 
-    public ExcelDTO() {
+    public DocDTO() {
 
     }
 
-    public ExcelDTO(Integer id, String data, String settings, String type, String error, String name) {
+    public DocDTO(Integer id, String data, String settings, String type, String error, String name) {
         this.id = id;
         this.data = data;
         this.settings = settings;

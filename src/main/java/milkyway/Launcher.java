@@ -10,7 +10,7 @@ import com.google.gson.GsonBuilder;
 import milkyway.connection.Connection;
 import milkyway.connection.WebServiceAccessor;
 import milkyway.dto.DTO;
-import milkyway.dto.ExcelDTO;
+import milkyway.dto.DocDTO;
 import milkyway.dto.FileDTO;
 import milkyway.dto.MultiplyExecDTO;
 import milkyway.excel.DocBuilder;
@@ -51,27 +51,6 @@ public class Launcher {
             server.stop();
         }
 
-    }
-
-    private static void addDocumentBuilderEventListener(SocketIOServer server, final DocBuilder docBuilder ) {
-        server.addEventListener("documentBuilder", FileDTO.class, new DataListener<FileDTO>() {
-            @Override
-            public void onData(SocketIOClient client, FileDTO data, AckRequest ackRequest) {
-                FileDTO response = new FileDTO();
-                try {
-                    response.setId(data.getId());
-                    response.setType(data.getType());
-                    response.setName("document.docx");
-                    byte[] buffer = docBuilder.make(null, null);
-                    response.setData(buffer);
-                } catch (Exception e) {
-                    response.setError(e.getMessage());
-
-                } finally {
-                    client.sendEvent("fileResponse", response);
-                }
-            }
-        });
     }
 
     private static void addRequestEventListener(SocketIOServer server, final Connection conn) {
@@ -190,9 +169,9 @@ public class Launcher {
 
     private static void addExportToExcelEventListener(SocketIOServer server) {
         final ExcelBuilder excelBuilder = new ExcelBuilder();
-        server.addEventListener("exportToExcel", ExcelDTO.class, new DataListener<ExcelDTO>() {
+        server.addEventListener("exportToExcel", DocDTO.class, new DataListener<DocDTO>() {
             @Override
-            public void onData(SocketIOClient client, ExcelDTO data, AckRequest ackRequest) {
+            public void onData(SocketIOClient client, DocDTO data, AckRequest ackRequest) {
                 FileDTO response = new FileDTO();
                 try {
                     response.setName(data.getName());
@@ -211,5 +190,27 @@ public class Launcher {
             }
         });
     }
+    private static void addDocumentBuilderEventListener(SocketIOServer server, final DocBuilder docBuilder ) {
+        server.addEventListener("documentBuilder", DocDTO.class, new DataListener<DocDTO>() {
+            @Override
+            public void onData(SocketIOClient client, DocDTO data, AckRequest ackRequest) {
+                FileDTO response = new FileDTO();
+                try {
+                    response.setId(data.getId());
+                    response.setType(data.getType());
+//                    data.getData()
+                    response.setName("document.docx");
+                    byte[] buffer = docBuilder.make(null, null);
+                    response.setData(buffer);
+                } catch (Exception e) {
+                    response.setError(e.getMessage());
+
+                } finally {
+                    client.sendEvent("fileResponse", response);
+                }
+            }
+        });
+    }
+
 
 }
