@@ -13,10 +13,7 @@ import milkyway.dto.DTO;
 import milkyway.dto.DocDTO;
 import milkyway.dto.FileDTO;
 import milkyway.dto.MultiplyExecDTO;
-import milkyway.excel.DocBuilder;
-import milkyway.excel.ExcelBuilder;
-import milkyway.excel.FormData;
-import milkyway.excel.Settings;
+import milkyway.excel.*;
 import milkyway.files.BlobWorker;
 import milkyway.files.MetaDataWorker;
 
@@ -29,7 +26,8 @@ public class Launcher {
 
         Configuration config = new Configuration();
         config.getSocketConfig().setReuseAddress(true);
-        config.setHostname("192.168.0.34");
+        config.setHostname("localhost");
+//        config.setHostname("192.168.0.34");
         config.setMaxFramePayloadLength(10000000);
         config.setMaxHttpContentLength(10000000);
         config.setPort(3000);
@@ -190,18 +188,22 @@ public class Launcher {
             }
         });
     }
-    private static void addDocumentBuilderEventListener(SocketIOServer server, final DocBuilder docBuilder ) {
+
+    private static void addDocumentBuilderEventListener(SocketIOServer server, final DocBuilder docBuilder) {
         server.addEventListener("documentBuilder", DocDTO.class, new DataListener<DocDTO>() {
             @Override
-            public void onData(SocketIOClient client, DocDTO data, AckRequest ackRequest) {
+            public void onData(SocketIOClient client, DocDTO request, AckRequest ackRequest) {
                 FileDTO response = new FileDTO();
                 try {
-                    response.setId(data.getId());
-                    response.setType(data.getType());
-//                    data.getData()
-                    response.setName("document.docx");
-                    byte[] buffer = docBuilder.make(null, null);
-                    response.setData(buffer);
+//                    response.setId(request.getId());
+                    response.setType(request.getType());
+
+                    DocSettings docSettings = new DocSettings(request.getData());
+                    DocBuilder.DocBuilderResult docBuilderResult = docBuilder.make(docSettings, response);
+
+                    response.setName(docBuilderResult.getName());
+                    response.setData(docBuilderResult.getResult());
+
                 } catch (Exception e) {
                     response.setError(e.getMessage());
 

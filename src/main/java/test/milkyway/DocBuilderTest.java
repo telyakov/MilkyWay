@@ -102,11 +102,9 @@ public class DocBuilderTest extends TestCase {
 
 
     @Test
-    public void test_Template() throws Exception {
-
-        DocBuilder docBuilder = new DocBuilder();
-        assertTrue("Ожидался шаблон",docBuilder.make(null,null).length>1000);
-
+    public void test_Template() throws Exception
+    {
+        assertTrue("Ожидался шаблон",(new DocBuilder()).make(null,null).getResult().length>1000);
     }
 
 

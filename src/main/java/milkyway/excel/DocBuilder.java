@@ -1,10 +1,7 @@
 package milkyway.excel;
 
-import jxl.Workbook;
-import jxl.WorkbookSettings;
-import jxl.write.WritableSheet;
-import jxl.write.WritableWorkbook;
 import milkyway.connection.WebServiceAccessor;
+import milkyway.dto.FileDTO;
 import milkyway.exceptions.ExcelBuilderException;
 import org.docx4j.dml.wordprocessingDrawing.Inline;
 import org.docx4j.openpackaging.exceptions.Docx4JException;
@@ -20,18 +17,37 @@ import org.docx4j.wml.R;
 
 import javax.xml.bind.JAXBElement;
 import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 public class DocBuilder {
 
-    public byte[] make(FormData data, Settings settings) throws ExcelBuilderException {
+    public class DocBuilderResult {
+        public byte[] getResult() {
+            return Result;
+        }
 
-        byte[] result = null;
+        public void setResult(byte[] result) {
+            Result = result;
+        }
+
+        public String getName() {
+            return Name;
+        }
+
+        public void setName(String name) {
+            Name = name;
+        }
+
+        private byte[] Result = null;
+        private String Name = "";
+    }
+
+
+    public DocBuilderResult make(DocSettings docSettings, FileDTO response) throws ExcelBuilderException {
+
+        DocBuilderResult result = new DocBuilderResult();
+        result.setName("document.docx");
         try {
             //TODO Передать TemplateID или ObjectID - для получения TemplateID.
             //TODO Передать FlatIDList по каждой квартире получить планировку, цену и этаж.
@@ -54,7 +70,8 @@ public class DocBuilder {
             template.getMainDocumentPart().addParagraphOfText("100% оплата/ипотека - 1 650 120 р. 2 этаж.");
 
             template.save(outputStream);
-            result = outputStream.toByteArray();
+
+            result.setResult(outputStream.toByteArray());
 
         } catch (Exception e) {
             throw new ExcelBuilderException(e.getMessage(), e);
@@ -88,7 +105,6 @@ public class DocBuilder {
                     for (Text t : tags) {
                         t.setValue("");
                     }
-
 
 
                     tags.get(0).setValue(name);
@@ -139,7 +155,7 @@ public class DocBuilder {
                     result = tags.get(0);
                     //.get(0).setValue(name);
 
-                   // tags.clear();
+                    // tags.clear();
                     break;
 
                 } else {
@@ -178,20 +194,20 @@ public class DocBuilder {
     }
 
     /**
-     *  Docx4j contains a utility method to create an image part from an array of
-     *  bytes and then adds it to the given package. In order to be able to add this
-     *  image to a paragraph, we have to convert it into an inline object. For this
-     *  there is also a method, which takes a filename hint, an alt-text, two ids
-     *  and an indication on whether it should be embedded or linked to.
-     *  One id is for the drawing object non-visual properties of the document, and
-     *  the second id is for the non visual drawing properties of the picture itself.
-     *  Finally we add this inline object to the paragraph and the paragraph to the
-     *  main document of the package.
+     * Docx4j contains a utility method to create an image part from an array of
+     * bytes and then adds it to the given package. In order to be able to add this
+     * image to a paragraph, we have to convert it into an inline object. For this
+     * there is also a method, which takes a filename hint, an alt-text, two ids
+     * and an indication on whether it should be embedded or linked to.
+     * One id is for the drawing object non-visual properties of the document, and
+     * the second id is for the non visual drawing properties of the picture itself.
+     * Finally we add this inline object to the paragraph and the paragraph to the
+     * main document of the package.
      *
-     *  @param wordMLPackage The package we want to add the image to
-     *  @param bytes         The bytes of the image
-     *  @throws Exception    Sadly the createImageInline method throws an Exception
-     *                       (and not a more specific exception type)
+     * @param wordMLPackage The package we want to add the image to
+     * @param bytes         The bytes of the image
+     * @throws Exception Sadly the createImageInline method throws an Exception
+     *                   (and not a more specific exception type)
      */
     public void addImageToPackage(WordprocessingMLPackage wordMLPackage, byte[] bytes) throws Exception {
         BinaryPartAbstractImage imagePart = BinaryPartAbstractImage.createImagePart(wordMLPackage, bytes);
@@ -218,12 +234,11 @@ public class DocBuilder {
         MainDocumentPart documentPart = wordMLPackage.getMainDocumentPart();
 
 
-        String xpath = "//w:r[w:t[contains(text(),'" + tagName  + "')]]";
+        String xpath = "//w:r[w:t[contains(text(),'" + tagName + "')]]";
 
         List<Object> lst = documentPart.getJAXBNodesViaXPath(xpath, false);
 
-        if(lst.size()>0)
-        {
+        if (lst.size() > 0) {
             org.docx4j.wml.R r = (org.docx4j.wml.R) lst.get(0);
 
             org.docx4j.wml.P parent = (org.docx4j.wml.P) r.getParent();
@@ -236,17 +251,16 @@ public class DocBuilder {
         }
 
 
-
     }
 
     /**
-     *  We create an object factory and use it to create a paragraph and a run.
-     *  Then we add the run to the paragraph. Next we create a drawing and
-     *  add it to the run. Finally we add the inline object to the drawing and
-     *  return the paragraph.
+     * We create an object factory and use it to create a paragraph and a run.
+     * Then we add the run to the paragraph. Next we create a drawing and
+     * add it to the run. Finally we add the inline object to the drawing and
+     * return the paragraph.
      *
-     * @param   inline The inline object containing the image.
-     * @return  the paragraph containing the image
+     * @param inline The inline object containing the image.
+     * @return the paragraph containing the image
      */
     private P addInlineImageToParagraph(Inline inline) {
         // Now add the in-line image to a paragraph
