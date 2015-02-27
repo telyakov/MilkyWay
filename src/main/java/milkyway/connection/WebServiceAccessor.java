@@ -83,7 +83,7 @@ public class WebServiceAccessor implements Connection {
         try {
             return this.getConn().execScalar(key, sql, userID);
         } catch (Exception e) {
-            throw new ConnectionException("Не удалось получить скалярное выражение.",e);
+            throw new ConnectionException(e.getMessage());
         }
     }
 

@@ -20,13 +20,16 @@ import milkyway.files.MetaDataWorker;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 
+/**
+ * @see 'https://github.com/mrniko/netty-socketio-demo'
+ */
 public class Launcher {
 
     public static void main(String[] args) throws InterruptedException {
 
         Configuration config = new Configuration();
         config.getSocketConfig().setReuseAddress(true);
-        //config.setHostname("localhost");
+//        config.setHostname("localhost");
 
         config.setHostname("192.168.0.34");
         config.setMaxFramePayloadLength(10000000);
@@ -190,6 +193,7 @@ public class Launcher {
         });
     }
 
+    //TODO Передвать объект final Connection conn
     private static void addDocumentBuilderEventListener(SocketIOServer server, final DocBuilder docBuilder) {
         server.addEventListener("documentBuilder", DocDTO.class, new DataListener<DocDTO>() {
             @Override

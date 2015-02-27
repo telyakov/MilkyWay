@@ -60,12 +60,13 @@ public class DocBuilder {
             WebServiceAccessor webServiceAccessor = new WebServiceAccessor();
 
             String flatID = docSettings.get("flatID");
-            String sql = "select f.ObjectParentID from directory.vFlats f where f.id=" + flatID.toString();
+            String sql = "select f.ObjectParentID from directory.vFlats f where f.id=" + flatID;
+
             String mainObjectID = webServiceAccessor.ExecScalar("test6543210", sql, "9");
-            String templateID = webServiceAccessor.ExecScalar("test6543210", "select directory.ParameterValueGet (22,64," + mainObjectID + ")", "9");
+            //String templateID = webServiceAccessor.ExecScalar("test6543210", "select directory.ParameterValueGet (22,64," + mainObjectID + ")", "9");
+            String templateID ="266756";
 
-
-            byte[] buf = webServiceAccessor.FileGet("test6543210", Integer.valueOf(templateID));
+            byte[] buf = webServiceAccessor.FileGet("6543210", Integer.valueOf(templateID));
             DocBuilder docBuilder = new DocBuilder();
 
             ByteArrayInputStream byteStream = new ByteArrayInputStream(buf);
