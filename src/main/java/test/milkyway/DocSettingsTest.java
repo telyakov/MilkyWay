@@ -1,13 +1,8 @@
 package test.milkyway;
 
 import junit.framework.TestCase;
-import milkyway.excel.DocSettings;
-import milkyway.excel.FormData;
-import org.junit.Assert;
+import milkyway.doc.DocSettings;
 import org.junit.Test;
-
-import java.util.HashMap;
-import java.util.LinkedHashMap;
 
 public class DocSettingsTest extends TestCase {
 

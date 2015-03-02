@@ -2,8 +2,8 @@ package test.milkyway;
 
 import junit.framework.TestCase;
 import milkyway.connection.WebServiceAccessor;
-import milkyway.excel.DocBuilder;
-import milkyway.excel.DocSettings;
+import milkyway.doc.DocBuilder;
+import milkyway.doc.DocSettings;
 import org.docx4j.openpackaging.exceptions.Docx4JException;
 import org.docx4j.openpackaging.packages.WordprocessingMLPackage;
 import org.docx4j.openpackaging.parts.WordprocessingML.MainDocumentPart;
@@ -14,6 +14,21 @@ import java.io.FileNotFoundException;
 import java.util.List;
 
 public class DocBuilderTest extends TestCase {
+
+    private DocBuilder docBuilder = null;
+
+    @Override
+    public void setUp() throws Exception {
+        super.setUp();
+        this.docBuilder = new DocBuilder(new WebServiceAccessor());
+    }
+
+
+    @Override
+    public void tearDown() throws Exception {
+        super.tearDown();
+        this.docBuilder =  null;
+    }
 
 
     @Test
@@ -27,8 +42,6 @@ public class DocBuilderTest extends TestCase {
         document.addParagraphOfText("[a]");
         document.addParagraphOfText("[b]");
         document.addParagraphOfText("[Договор,  #Цена_м2_Общая_проектная, СуммаПрописьюБухФорматЛСТ#]");
-
-        DocBuilder docBuilder = new DocBuilder();
 
         //Replace tags.
         docBuilder.replacePlaceholder(template, "[a]", "1");
@@ -66,7 +79,6 @@ public class DocBuilderTest extends TestCase {
     @Test
     public void test_Template_To_Result_For_Manual_Check() throws Exception {
 
-        DocBuilder docBuilder = new DocBuilder();
 
         WordprocessingMLPackage template = docBuilder.getTemplate("template.docx");
         docBuilder.replacePlaceholder(template, "[a_tag]", "Текст вместо a_tag");
@@ -100,14 +112,8 @@ public class DocBuilderTest extends TestCase {
     {
         DocSettings docSettings = new DocSettings("{\"flatID\":12805,\"templateID\":98}");
 
-        assertTrue("Ожидался шаблон",(new DocBuilder()).make(docSettings).getResult().length>1000);
+        assertTrue("Ожидался шаблон",(this.docBuilder).make(docSettings).getResult().length>1000);
     }
-
-
-
-
-
-
 
 
 }

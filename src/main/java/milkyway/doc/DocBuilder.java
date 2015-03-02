@@ -1,7 +1,6 @@
-package milkyway.excel;
+package milkyway.doc;
 
-import milkyway.connection.WebServiceAccessor;
-import milkyway.dto.FileDTO;
+import milkyway.connection.Connection;
 import milkyway.exceptions.ExcelBuilderException;
 import org.docx4j.dml.wordprocessingDrawing.Inline;
 import org.docx4j.openpackaging.exceptions.Docx4JException;
@@ -21,6 +20,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DocBuilder {
+
+    public static final String TEST_6543210 = "6543210";
+    Connection connection = null;
+
+
+    public DocBuilder (Connection conn)
+    {
+        this.connection = conn;
+    }
 
     public class DocBuilderResult {
         public byte[] getResult() {
@@ -49,30 +57,52 @@ public class DocBuilder {
         DocBuilderResult result = new DocBuilderResult();
         result.setName("document.docx");
         try {
-            //TODO Передать TemplateID или ObjectID - для получения TemplateID.
-            //TODO Передать FlatIDList по каждой квартире получить планировку, цену и этаж.
+
+            //TODO Получить планировку по FlatID
             //TODO Удалить все не подставленные теги.
 
             //Шаблон по Гатчине в формате docx
             //int templateID = 256207;
+
+
+            //FlatID колпино 14127.
             int flatImageID = 223740;
 
-            WebServiceAccessor webServiceAccessor = new WebServiceAccessor();
+
 
             String flatID = docSettings.get("flatID");
-            String sql = "select f.ObjectParentID from directory.vFlats f where f.id=" + flatID;
 
-            String mainObjectID = webServiceAccessor.ExecScalar("test6543210", sql, "9");
-            //String templateID = webServiceAccessor.ExecScalar("test6543210", "select directory.ParameterValueGet (22,64," + mainObjectID + ")", "9");
-            String templateID ="266756";
+            if (flatID.length()==0)
+            {
+                throw  new ExcelBuilderException("Ключ помещение пустой. FlatID=''.");
+            }
 
-            byte[] buf = webServiceAccessor.FileGet("6543210", Integer.valueOf(templateID));
-            DocBuilder docBuilder = new DocBuilder();
+
+            String sql = "select isnull(o.ParentID,o.id) as Result from directory.vFlats f " +
+                          "inner join directory.Objects o on o.id = f.ObjectParentID where f.id ="  + flatID;
+
+            String mainObjectID = this.connection.ExecScalar(TEST_6543210, sql, "9");
+
+            if (mainObjectID.length()==0)
+            {
+                throw  new ExcelBuilderException("Для попещения с ключом='" + flatID + "', не найден ключ базового объекта.");
+            }
+
+
+            String templateID = this.connection.ExecScalar(TEST_6543210, "select directory.ParameterValueGet (22,123," + mainObjectID + ")", "9");
+            //String templateID ="266756";
+
+
+            String sqlForTemplateFileID = "select ea.FilesID from dbo.EntityAttachments ea where ea.EntityTypeID=6 and ea.EntityId=" + templateID;
+            String templateFileID = this.connection.ExecScalar(TEST_6543210,sqlForTemplateFileID,"9");
+
+            byte[] buf = this.connection.FileGet("6543210", Integer.valueOf(templateFileID));
+
 
             ByteArrayInputStream byteStream = new ByteArrayInputStream(buf);
             WordprocessingMLPackage template = WordprocessingMLPackage.load(byteStream);
 
-            docBuilder.addImage(template, "Квартира_Планировка", webServiceAccessor.FileGet("test6543210", flatImageID));
+            addImage(template, "Квартира_Планировка", this.connection.FileGet(TEST_6543210, flatImageID));
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 
             template.getMainDocumentPart().addParagraphOfText("100% оплата/ипотека - 1 650 120 р. 2 этаж.");

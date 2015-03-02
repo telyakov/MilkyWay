@@ -9,6 +9,8 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import milkyway.connection.Connection;
 import milkyway.connection.WebServiceAccessor;
+import milkyway.doc.DocBuilder;
+import milkyway.doc.DocSettings;
 import milkyway.dto.DTO;
 import milkyway.dto.DocDTO;
 import milkyway.dto.FileDTO;
@@ -25,26 +27,27 @@ import java.util.LinkedHashMap;
  */
 public class Launcher {
 
+    private static final String hostName = "localhost";
+
     public static void main(String[] args) throws InterruptedException {
 
         Configuration config = new Configuration();
         config.getSocketConfig().setReuseAddress(true);
-//        config.setHostname("localhost");
-
-        config.setHostname("192.168.0.34");
+        config.setHostname(hostName);
+        System.out.printf("Host name = '{0}'", hostName);
         config.setMaxFramePayloadLength(10000000);
         config.setMaxHttpContentLength(10000000);
         config.setPort(3000);
         final Connection conn = new WebServiceAccessor();
         final SocketIOServer server = new SocketIOServer(config);
-        final DocBuilder docBuilder = new DocBuilder();
+
         Launcher.addRequestEventListener(server, conn);
         Launcher.addExecMultiplyEventListener(server, conn);
         Launcher.addFileUploadEventListener(server, conn);
         Launcher.addFileRequestEventListener(server, conn);
         Launcher.addXmlRequestEventListener(server, conn);
         Launcher.addExportToExcelEventListener(server);
-        Launcher.addDocumentBuilderEventListener(server, docBuilder);
+        Launcher.addDocumentBuilderEventListener(server, conn);
 
         try {
             server.start();
@@ -194,7 +197,7 @@ public class Launcher {
     }
 
     //TODO Передвать объект final Connection conn
-    private static void addDocumentBuilderEventListener(SocketIOServer server, final DocBuilder docBuilder) {
+    private static void addDocumentBuilderEventListener(SocketIOServer server,  final Connection conn) {
         server.addEventListener("documentBuilder", DocDTO.class, new DataListener<DocDTO>() {
             @Override
             public void onData(SocketIOClient client, DocDTO request, AckRequest ackRequest) {
@@ -204,6 +207,8 @@ public class Launcher {
                     response.setType(request.getType());
 
                     DocSettings docSettings = new DocSettings(request.getData());
+
+                    DocBuilder docBuilder = new DocBuilder(conn);
                     DocBuilder.DocBuilderResult docBuilderResult = docBuilder.make(docSettings);
 
                     response.setName(docBuilderResult.getName());
