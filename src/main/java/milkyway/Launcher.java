@@ -89,13 +89,13 @@ public class Launcher {
     private static void addExecMultiplyEventListener(SocketIOServer server, final Connection conn) {
         server.addEventListener("execMultiply", MultiplyExecDTO.class, new DataListener<MultiplyExecDTO>() {
             @Override
-            public void onData(SocketIOClient client, MultiplyExecDTO rquest, AckRequest ackRequest) {
+            public void onData(SocketIOClient client, MultiplyExecDTO request, AckRequest ackRequest) {
                 MultiplyExecDTO response = new MultiplyExecDTO();
                 try {
-                    response.setId(rquest.getId());
-                    response.setType(rquest.getType());
+                    response.setId(request.getId());
+                    response.setType(request.getType());
 
-                    Boolean success = conn.ExecMultiply(rquest.getKey(), rquest.getSqlList());
+                    Boolean success = conn.ExecMultiply(request.getKey(), request.getSqlList());
                     response.setData(success.toString());
                     if (!success) {
                         response.setError("Unknown server error");
