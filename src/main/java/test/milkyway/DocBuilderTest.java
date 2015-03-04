@@ -87,11 +87,16 @@ public class DocBuilderTest extends TestCase {
         docBuilder.replacePlaceholder(template, "[Договор,#Сумма#]", "Текст вместо Договор,#Сумма#");
         docBuilder.replacePlaceholder(template, "[ВсеПлановыеПлатежи]", "График платежей");
 
+        docBuilder.replacePlaceholder(template, "[Квартира,  #Цена_100%# #Этаж# ]", "Цена при 100%");
+        docBuilder.replacePlaceholder(template, "[Квартира,  #Цена_Рассрочка#]", "Базовая цена");
+
+
         //225323 - Рекламная планировка квартиры
         //223740 - Планировка с осями
 
         WebServiceAccessor webServiceAccessor = new WebServiceAccessor();
-        docBuilder.addImage(template, "Квартира_Планировка", webServiceAccessor.FileGet("test6543210", 223740));
+        docBuilder.addImage(template, "Квартира_Планировка","[Квартира_Планировка, Картинка]", webServiceAccessor.FileGet("test6543210", 223740));
+        docBuilder.addImage(template, "Квартира_Планировка","[Квартира_Планировка, Картинка]", webServiceAccessor.FileGet("test6543210", 223740));
 
 
         //docBuilder.addImage(template, webServiceAccessor.FileGet("test6543210", 225323));
@@ -99,6 +104,8 @@ public class DocBuilderTest extends TestCase {
         //template.getMainDocumentPart().addParagraphOfText("100% оплата/ипотека - 5 650 120 р. 3 этаж.");
         //docBuilder.addImage(template, webServiceAccessor.FileGet("test6543210", 223740));
         //template.getMainDocumentPart().addParagraphOfText("100% оплата/ипотека - 1 650 120 р. 2 этаж.");
+
+        docBuilder.replacePlaceholder(template,"[Сотрудник, #Подпись#]","");
 
         //Save to file for manual check.
         template.save(new java.io.File("result.docx"));
@@ -110,7 +117,7 @@ public class DocBuilderTest extends TestCase {
     @Test
     public void test_Template() throws Exception
     {
-        DocSettings docSettings = new DocSettings("{\"flatID\":12805,\"templateID\":98}");
+        DocSettings docSettings = new DocSettings("{\"flatID\":14127}");
 
         assertTrue("Ожидался шаблон",(this.docBuilder).make(docSettings).getResult().length>1000);
     }

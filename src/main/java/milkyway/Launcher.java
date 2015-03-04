@@ -31,6 +31,7 @@ public class Launcher {
 
     public static void main(String[] args) throws InterruptedException {
 
+
         Configuration config = new Configuration();
         config.getSocketConfig().setReuseAddress(true);
         config.setHostname(hostName);
@@ -55,6 +56,7 @@ public class Launcher {
         } catch (Exception e) {
             server.stop();
         }
+
 
     }
 

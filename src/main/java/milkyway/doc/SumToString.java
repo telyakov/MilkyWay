@@ -29,7 +29,7 @@ public class SumToString {
         // TODO: Научиться парсить числа > 1000000
         String s = d.toString();
         int n = s.length() - s.lastIndexOf('.');
-        if (d == null || d < 0.0 || d > 1000000.0 || n > 3) {
+        if (d == null || d < 0.0 || d > 10000000.0 || n > 3) {
             System.out.println("Пока гарантированно преобразуются лишь числа от 0.0 до 1000000.0");
             return null;
         }

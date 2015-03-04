@@ -16,12 +16,13 @@ import org.docx4j.wml.R;
 
 import javax.xml.bind.JAXBElement;
 import java.io.*;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
 
 public class DocBuilder {
 
-    public static final String TEST_6543210 = "6543210";
+    public static final String securityKey = "test6543210";
     Connection connection = null;
 
 
@@ -66,9 +67,7 @@ public class DocBuilder {
 
 
             //FlatID колпино 14127.
-            int flatImageID = 223740;
-
-
+            //int flatImageID = 223740;
 
             String flatID = docSettings.get("flatID");
 
@@ -77,35 +76,75 @@ public class DocBuilder {
                 throw  new ExcelBuilderException("Ключ помещение пустой. FlatID=''.");
             }
 
+            String sql = "select isnull(o.ParentID,o.id) as MainObjectID from directory.vFlats f (nolock) " +
+                          "inner join directory.Objects o (nolock) on o.id = f.ObjectParentID where f.id ="  + flatID;
 
-            String sql = "select isnull(o.ParentID,o.id) as Result from directory.vFlats f " +
-                          "inner join directory.Objects o on o.id = f.ObjectParentID where f.id ="  + flatID;
-
-            String mainObjectID = this.connection.ExecScalar(TEST_6543210, sql, "9");
+            String mainObjectID = this.connection.ExecScalar(securityKey, sql, "9");
 
             if (mainObjectID.length()==0)
             {
-                throw  new ExcelBuilderException("Для попещения с ключом='" + flatID + "', не найден ключ базового объекта.");
+                throw  new ExcelBuilderException("Для попещения с ключом='" + flatID + "', не найден базовый объект. Sql='" + sql + "'");
             }
 
+            String sqlFormtemplateID = "select directory.ParameterValueGet (22,123," + mainObjectID + ")";
+            String templateID = connection.ExecScalar(securityKey, sqlFormtemplateID, "9");
 
-            String templateID = this.connection.ExecScalar(TEST_6543210, "select directory.ParameterValueGet (22,123," + mainObjectID + ")", "9");
-            //String templateID ="266756";
+            if (templateID.length()==0)
+            {
+                throw new ExcelBuilderException("Для объекта с ключом='" + mainObjectID + "', не найден шаблон.sql='" + sqlFormtemplateID + "'");
+            }
 
+            String sqlForTemplateFileID = "select ea.FilesID from dbo.EntityAttachments ea (nolock) where ea.EntityTypeID=6 and ea.EntityId=" + templateID;
+            String templateFileID = connection.ExecScalar(securityKey,sqlForTemplateFileID,"9");
 
-            String sqlForTemplateFileID = "select ea.FilesID from dbo.EntityAttachments ea where ea.EntityTypeID=6 and ea.EntityId=" + templateID;
-            String templateFileID = this.connection.ExecScalar(TEST_6543210,sqlForTemplateFileID,"9");
+            String sqlForFlatImage =
+                        "SELECT ea.FilesID FROM dbo.EntityAttachments ea (nolock) INNER JOIN dbo.Files f (nolock) ON ea.FilesId= f.id WHERE ea.EntityTypeID = 4 AND ea.EntityID=" + flatID  + " AND f.FilesTypesId=11 AND ea.Removed IS null";
 
-            byte[] buf = this.connection.FileGet("6543210", Integer.valueOf(templateFileID));
+            String flatImageID = connection.ExecScalar(securityKey,sqlForFlatImage,"9");
 
+            if(flatImageID.length()==0)
+            {
+                throw new ExcelBuilderException("Файл с планировкой не найден. Ключом квартиры='" + flatID + "'. sql='" + sqlForFlatImage + "'");
+            }
+
+            byte[] buf = connection.FileGet(securityKey, Integer.valueOf(templateFileID));
 
             ByteArrayInputStream byteStream = new ByteArrayInputStream(buf);
             WordprocessingMLPackage template = WordprocessingMLPackage.load(byteStream);
 
-            addImage(template, "Квартира_Планировка", this.connection.FileGet(TEST_6543210, flatImageID));
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 
-            template.getMainDocumentPart().addParagraphOfText("100% оплата/ипотека - 1 650 120 р. 2 этаж.");
+
+            String flatPrice = connection.ExecScalar(securityKey, "SELECT cast(v.CostCurrent AS decimal(14,2)) FROM directory.vFlats v WHERE v.ID = " + flatID, "9");
+            if(flatPrice.length()>0)
+            {
+                String flatFloor  =  connection.ExecScalar(securityKey,"SELECT v.floor FROM directory.vFlats v WHERE v.ID = " + flatID, "9");
+                flatPrice=flatPrice.replace(',','.');
+
+                NumberFormat formatter = NumberFormat.getCurrencyInstance();
+                String flatDesc ="100% оплата/ипотека – " +  formatter.format((Float.valueOf(flatPrice))) + ", " + flatFloor + " этаж.";
+
+                //[Квартира,  #Цена_100%# #Этаж# ]
+                //[Квартира,  #Цена_Рассрочка#]
+
+                replacePlaceholder(template, "[Квартира, #Цена_100%# #Этаж#]",flatDesc);
+
+                String sqlForBaseCost = "SELECT UtilsDecimal.Format(NullIf(f.BaseCost, 0)) AS BaseCost FROM directory.vFlats AS f WHERE f.ID= " + flatID;
+
+                String baseCost = connection.ExecScalar(securityKey,sqlForBaseCost, "9");
+
+                String baseCostDesc = "";
+
+                if (baseCost.length()>0)
+                {
+                    baseCostDesc = "Базовая цена – " +  baseCost;
+                }
+
+                replacePlaceholder(template, "[Квартира, #Цена_Рассрочка#]",baseCostDesc);
+                addImage(template, "Картинка","[Квартира_Планировка, Картинка]",connection.FileGet(securityKey, Integer.valueOf(flatImageID)));
+
+
+            }
 
             template.save(outputStream);
             result.setResult(outputStream.toByteArray());
@@ -128,14 +167,18 @@ public class DocBuilder {
 
             if (textElement.getValue().equalsIgnoreCase(placeholder)) {
                 textElement.setValue(name);
-            } else if (textElement.getValue().equals("[")) {
-                tag = "[";
+
+
+
+            } else if (textElement.getValue().startsWith("[")  ) {
+                tag = textElement.getValue();
                 tags.add(textElement);
 
-            } else if (textElement.getValue().equals("]")) {
+
+            }   else if (textElement.getValue().endsWith("]")) {
                 tags.add(textElement);
 
-                tag += "]";
+                tag += textElement.getValue();
 
                 if (tag.equals(placeholder)) {
 
@@ -143,14 +186,15 @@ public class DocBuilder {
                         t.setValue("");
                     }
 
-
                     tags.get(0).setValue(name);
+
 
                     tags.clear();
                     break;
 
                 } else {
                     tag = "";
+                    tags.clear();
                 }
 
             } else if (tag.length() > 0) {
@@ -230,7 +274,8 @@ public class DocBuilder {
     }
 
 
-    public void addImage(WordprocessingMLPackage wordMLPackage, String tagName, byte[] bytes) throws Exception {
+    //TODO  Оставить вместо tagName и fullTagName один тег tagName.
+    public void addImage(WordprocessingMLPackage wordMLPackage, String tagName,String fullTagName, byte[] bytes) throws Exception {
         BinaryPartAbstractImage imagePart = BinaryPartAbstractImage.createImagePart(wordMLPackage, bytes);
 
         int docPrId = 1;
@@ -254,8 +299,12 @@ public class DocBuilder {
 
             int index = documentPart.getContent().indexOf(parent);
 
-            documentPart.getContent().remove(parent);
-            documentPart.getContent().add(index, paragraph);
+            if(index != -1)
+            {
+                //documentPart.getContent().remove(parent);
+                documentPart.getContent().add(index, paragraph);
+                this.replacePlaceholder(wordMLPackage,fullTagName,"");
+            }
 
         }
 
