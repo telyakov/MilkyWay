@@ -2,7 +2,8 @@ package milkyway.dto;
 
 public class FileDTO {
     private byte[] data;
-    private int id;
+    private String id;
+    private String fileID;
     private String sql;
     private String error;
     private String key;
@@ -12,16 +13,24 @@ public class FileDTO {
     public FileDTO() {
     }
 
-    public FileDTO(int id, byte[] data, String error, String key, String name, String sql) {
+    public FileDTO(String id, String fileID,  byte[] data, String error, String key, String name, String sql) {
         super();
         this.id = id;
+        this.fileID = fileID;
         this.data = data;
         this.error = error;
         this.key = key;
         this.name = name;
-        this.name = sql;
+        this.sql = sql;
     }
 
+    public String getFileID() {
+        return fileID;
+    }
+
+    public void setFileID(String fileID) {
+        this.fileID = fileID;
+    }
     public String getType() {
         return type;
     }
@@ -54,11 +63,11 @@ public class FileDTO {
         this.key = key;
     }
 
-    public int getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(String id) {
         this.id = id;
     }
 

@@ -1,7 +1,7 @@
 package milkyway.dto;
 
 public class DocDTO {
-    private Integer id;
+    private String id;
     private String data;
     private String settings;
     private String type;
@@ -12,7 +12,7 @@ public class DocDTO {
 
     }
 
-    public DocDTO(Integer id, String data, String settings, String type, String error, String name) {
+    public DocDTO(String id, String data, String settings, String type, String error, String name) {
         this.id = id;
         this.data = data;
         this.settings = settings;
@@ -29,11 +29,11 @@ public class DocDTO {
         this.name = name;
     }
 
-    public Integer getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(String id) {
         this.id = id;
     }
 

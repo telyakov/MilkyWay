@@ -17,7 +17,7 @@ public class BlobWorker implements Runnable {
     @Override
     public void run() {
         try {
-            byte[] result = conn.FileGet(this.request.getKey(),this.request.getId());
+            byte[] result = conn.FileGet(this.request.getKey(),Integer.parseInt(this.request.getFileID()));
             this.dto.setData(result);
         }
         catch (Exception e) {

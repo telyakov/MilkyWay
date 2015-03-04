@@ -21,11 +21,10 @@ public class MetaDataWorker  implements Runnable{
     @Override
     public void run() {
         try {
-            String sql = "Attachments.MetaDataGet " + this.request.getId();
+            String sql = "Attachments.MetaDataGet " + this.request.getFileID();
             LinkedHashMap<String,HashMap<String,String>> result = conn.Exec(this.request.getKey(), sql, false);
-            HashMap<String, String> row =conn.getRow(result, 0);
+            HashMap<String, String> row = conn.getRow(result, 0);
             this.dto.setName(row.get("name"));
-            this.dto.setId(request.getId());
         }
         catch (Exception e) {
             this.dto.setError(e.getMessage());

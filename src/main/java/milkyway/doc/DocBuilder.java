@@ -22,7 +22,7 @@ import java.util.List;
 
 public class DocBuilder {
 
-    public static final String securityKey = "test6543210";
+    public static final String securityKey = "6543210";
     Connection connection = null;
 
 

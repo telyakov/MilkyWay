@@ -27,7 +27,7 @@ import java.util.LinkedHashMap;
  */
 public class Launcher {
 
-    private static final String hostName = "localhost";
+    private static final String hostName = "192.168.0.34";
 
     public static void main(String[] args) throws InterruptedException {
 
@@ -63,16 +63,19 @@ public class Launcher {
     private static void addRequestEventListener(SocketIOServer server, final Connection conn) {
         server.addEventListener("request", DTO.class, new DataListener<DTO>() {
             @Override
-            public void onData(SocketIOClient client, DTO data, AckRequest ackRequest) {
+            public void onData(SocketIOClient client, DTO request, AckRequest ackRequest) {
                 DTO response = new DTO();
                 try {
-                    response.setId(data.getId());
-                    response.setType(data.getType());
-                    LinkedHashMap<String, HashMap<String, String>> result = conn.Exec(data.getKey(), data.getQuery(), data.getIsCache());
+
+                    response.setId(request.getId());
+                    response.setType(request.getType());
+
+                    LinkedHashMap<String, HashMap<String, String>> result = conn.Exec(request.getKey(), request.getQuery(), request.getIsCache());
                     Gson gson = new GsonBuilder().serializeNulls().create();
                     String json = gson.toJson(result);
+
                     response.setData(json);
-                    response.setIsCache(data.getIsCache());
+                    response.setIsCache(request.getIsCache());
                 } catch (Exception e) {
                     response.setError(e.getMessage());
 
@@ -86,12 +89,13 @@ public class Launcher {
     private static void addExecMultiplyEventListener(SocketIOServer server, final Connection conn) {
         server.addEventListener("execMultiply", MultiplyExecDTO.class, new DataListener<MultiplyExecDTO>() {
             @Override
-            public void onData(SocketIOClient client, MultiplyExecDTO data, AckRequest ackRequest) {
+            public void onData(SocketIOClient client, MultiplyExecDTO rquest, AckRequest ackRequest) {
                 MultiplyExecDTO response = new MultiplyExecDTO();
                 try {
-                    response.setId(data.getId());
-                    response.setType(data.getType());
-                    Boolean success = conn.ExecMultiply(data.getKey(), data.getSqlList());
+                    response.setId(rquest.getId());
+                    response.setType(rquest.getType());
+
+                    Boolean success = conn.ExecMultiply(rquest.getKey(), rquest.getSqlList());
                     response.setData(success.toString());
                     if (!success) {
                         response.setError("Unknown server error");
@@ -109,13 +113,14 @@ public class Launcher {
     private static void addFileUploadEventListener(SocketIOServer server, final Connection conn) {
         server.addEventListener("fileUpload", FileDTO.class, new DataListener<FileDTO>() {
             @Override
-            public void onData(SocketIOClient client, FileDTO data, AckRequest ackRequest) {
+            public void onData(SocketIOClient client, FileDTO request, AckRequest ackRequest) {
                 DTO response = new DTO();
                 try {
-                    response.setId(data.getName());
-                    response.setType(data.getType());
+                    response.setId(request.getName());
+                    response.setType(request.getType());
                     response.setData("true");
-                    conn.AttachmentIns(data.getKey(), data.getSql(), data.getData());
+
+                    conn.AttachmentIns(request.getKey(), request.getSql(), request.getData());
                 } catch (Exception e) {
                     response.setError(e.getMessage());
 
@@ -129,11 +134,15 @@ public class Launcher {
     private static void addFileRequestEventListener(SocketIOServer server, final Connection conn) {
         server.addEventListener("fileRequest", FileDTO.class, new DataListener<FileDTO>() {
             @Override
-            public void onData(SocketIOClient client, FileDTO data, AckRequest ackRequest) {
+            public void onData(SocketIOClient client, FileDTO request, AckRequest ackRequest) {
                 FileDTO response = new FileDTO();
                 try {
-                    Thread blobThread = new Thread(new BlobWorker(response, conn, data));
-                    Thread metaThread = new Thread(new MetaDataWorker(response, conn, data));
+                    response.setId(request.getId());
+                    response.setFileID(request.getFileID());
+                    response.setType(request.getType());
+
+                    Thread blobThread = new Thread(new BlobWorker(response, conn, request));
+                    Thread metaThread = new Thread(new MetaDataWorker(response, conn, request));
                     blobThread.start();
                     metaThread.start();
                     blobThread.join();
@@ -151,17 +160,21 @@ public class Launcher {
     private static void addXmlRequestEventListener(SocketIOServer server, final Connection conn) {
         server.addEventListener("xmlRequest", FileDTO.class, new DataListener<FileDTO>() {
             @Override
-            public void onData(SocketIOClient client, FileDTO data, AckRequest ackRequest) {
+            public void onData(SocketIOClient client, FileDTO request, AckRequest ackRequest) {
                 FileDTO response = new FileDTO();
                 try {
-                    response.setName(data.getName());
-                    response.setType(data.getType());
-                    String sql = "core.XmlFileGet '" + data.getName() + "'";
-                    LinkedHashMap<String, HashMap<String, String>> result = conn.Exec(data.getKey(), sql, false);
+                    response.setId(request.getId());
+                    response.setName(request.getName());
+                    response.setType(request.getType());
+
+                    String sql = "core.XmlFileGet '" + request.getName() + "'";
+                    LinkedHashMap<String, HashMap<String, String>> result = conn.Exec(request.getKey(), sql, false);
                     HashMap<String, String> row = conn.getRow(result, 0);
-                    response.setId(data.getId());
-                    data.setId(Integer.parseInt(row.get("id")));
-                    Thread blobThread = new Thread(new BlobWorker(response, conn, data));
+
+                    request.setFileID(row.get("id"));
+                    response.setFileID(request.getFileID());
+
+                    Thread blobThread = new Thread(new BlobWorker(response, conn, request));
                     blobThread.start();
                     blobThread.join();
                 } catch (Exception e) {
@@ -178,15 +191,17 @@ public class Launcher {
         final ExcelBuilder excelBuilder = new ExcelBuilder();
         server.addEventListener("exportToExcel", DocDTO.class, new DataListener<DocDTO>() {
             @Override
-            public void onData(SocketIOClient client, DocDTO data, AckRequest ackRequest) {
+            public void onData(SocketIOClient client, DocDTO request, AckRequest ackRequest) {
                 FileDTO response = new FileDTO();
                 try {
-                    response.setName(data.getName());
-                    response.setType(data.getType());
-                    response.setId(data.getId());
-                    FormData formData = new FormData(data.getData());
-                    Settings settings = new Settings(data.getSettings());
+                    response.setId(request.getId());
+                    response.setName(request.getName());
+                    response.setType(request.getType());
+
+                    FormData formData = new FormData(request.getData());
+                    Settings settings = new Settings(request.getSettings());
                     byte[] buffer = excelBuilder.makeExcel(formData, settings);
+
                     response.setData(buffer);
                 } catch (Exception e) {
                     response.setError(e.getMessage());
@@ -198,14 +213,13 @@ public class Launcher {
         });
     }
 
-    //TODO Передвать объект final Connection conn
     private static void addDocumentBuilderEventListener(SocketIOServer server,  final Connection conn) {
         server.addEventListener("documentBuilder", DocDTO.class, new DataListener<DocDTO>() {
             @Override
             public void onData(SocketIOClient client, DocDTO request, AckRequest ackRequest) {
                 FileDTO response = new FileDTO();
                 try {
-
+                    response.setId(request.getId());
                     response.setType(request.getType());
 
                     DocSettings docSettings = new DocSettings(request.getData());
@@ -225,6 +239,5 @@ public class Launcher {
             }
         });
     }
-
 
 }
