@@ -125,6 +125,7 @@ public class Launcher {
                     response.setId(request.getId());
                     response.setType(request.getType());
 
+                    
                     clientDecorator.setClient(client);
                     if(!clientDecorator.isLogin()){
                         throw new AuthorizationException();
